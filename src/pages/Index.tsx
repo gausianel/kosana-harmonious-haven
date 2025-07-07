@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,25 @@ import SearchFilters from "@/components/SearchFilters";
 import UserProfile from "@/components/UserProfile";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect authenticated users based on their role
+  useEffect(() => {
+    if (!loading && user && profile) {
+      if (profile.role === 'owner') {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, profile, loading, navigate]);
 
   const handleSearch = (filters: any) => {
     console.log('Search filters:', filters);
     // TODO: Implement search functionality
+  };
+
+  const handleOwnerSignup = () => {
+    navigate('/auth');
   };
 
   const features = [
@@ -71,7 +84,7 @@ const Index = () => {
               {user ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 hover-scale">
                       <User className="w-4 h-4" />
                       <span className="hidden sm:inline">Profil</span>
                     </Button>
@@ -85,7 +98,7 @@ const Index = () => {
                   onClick={() => navigate('/auth')}
                   variant="ghost" 
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 hover-scale"
                 >
                   <LogIn className="w-4 h-4" />
                   Masuk
@@ -102,7 +115,7 @@ const Index = () => {
         
         <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
           <div className="animate-fade-in">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-scale-in">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 animate-scale-in">
               KOSANA
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in [animation-delay:200ms]">
@@ -201,14 +214,14 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 text-lg hover-scale"
+              className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg hover-scale"
             >
               Mulai Cari Kost
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              onClick={() => navigate('/auth')}
+              onClick={handleOwnerSignup}
               className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg hover-scale"
             >
               Daftar Sebagai Pemilik

@@ -39,7 +39,7 @@ const Auth = () => {
             title: "Berhasil masuk",
             description: "Selamat datang di KOSANA!"
           });
-          navigate('/');
+          // Redirection will be handled by the auth context
         }
       } else {
         const { error } = await signUp(email, password, fullName, role);
@@ -70,7 +70,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
+        <div className="text-center animate-fade-in">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
@@ -79,13 +79,15 @@ const Auth = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali ke Beranda
           </Button>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">KOSANA</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            KOSANA
+          </h1>
           <p className="text-gray-600">
             {isLogin ? 'Masuk ke akun Anda' : 'Daftar akun baru'}
           </p>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg animate-fade-in [animation-delay:200ms]">
           <CardHeader>
             <CardTitle>{isLogin ? 'Masuk' : 'Daftar'}</CardTitle>
             <CardDescription>
@@ -108,6 +110,7 @@ const Auth = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
+                      className="animate-fade-in"
                     />
                   </div>
                   
@@ -118,7 +121,7 @@ const Auth = () => {
                         type="button"
                         variant={role === 'user' ? 'default' : 'outline'}
                         onClick={() => setRole('user')}
-                        className="flex items-center justify-center gap-2"
+                        className="flex items-center justify-center gap-2 hover-scale"
                       >
                         <User className="w-4 h-4" />
                         Pencari Kost
@@ -127,7 +130,7 @@ const Auth = () => {
                         type="button"
                         variant={role === 'owner' ? 'default' : 'outline'}
                         onClick={() => setRole('owner')}
-                        className="flex items-center justify-center gap-2"
+                        className="flex items-center justify-center gap-2 hover-scale"
                       >
                         <Building2 className="w-4 h-4" />
                         Pemilik Kost
@@ -163,7 +166,7 @@ const Auth = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-blue-600 hover:bg-blue-700 hover-scale"
                 disabled={loading}
               >
                 {loading ? 'Memproses...' : (isLogin ? 'Masuk' : 'Daftar')}

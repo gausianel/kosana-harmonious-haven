@@ -1,5 +1,6 @@
 
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,11 +8,16 @@ import { User, Building2, LogOut, Settings } from "lucide-react";
 
 const UserProfile = () => {
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   if (!user || !profile) return null;
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   return (
@@ -36,15 +42,20 @@ const UserProfile = () => {
         </div>
         
         <div className="flex flex-col gap-2">
-          <Button variant="outline" size="sm" className="w-full justify-start">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleProfileClick}
+            className="w-full justify-start hover-scale"
+          >
             <Settings className="w-4 h-4 mr-2" />
-            Pengaturan
+            Lihat Profil
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={handleSignOut}
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 hover-scale"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Keluar
