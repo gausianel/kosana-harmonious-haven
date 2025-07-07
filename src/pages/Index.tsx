@@ -1,14 +1,23 @@
 
 import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, MapPin, Users, Wifi, Car, Shield, Star } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Users, Wifi, Car, Shield, Star, User, LogIn } from "lucide-react";
 import ImageCarousel from "@/components/ImageCarousel";
+import SearchFilters from "@/components/SearchFilters";
+import UserProfile from "@/components/UserProfile";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSearch = (filters: any) => {
+    console.log('Search filters:', filters);
+    // TODO: Implement search functionality
+  };
 
   const features = [
     { icon: Wifi, title: "WiFi Gratis", description: "Internet cepat 24/7" },
@@ -35,13 +44,63 @@ const Index = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                KOSANA
+              </h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span className="hidden sm:inline">Profil</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 p-0" align="end">
+                    <UserProfile />
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  variant="ghost" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Masuk
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section with Background Gallery */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
         <ImageCarousel />
         
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
+        <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
           <div className="animate-fade-in">
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-scale-in">
               KOSANA
@@ -54,36 +113,10 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Search Form */}
-          <Card className="bg-white/95 backdrop-blur-sm shadow-2xl animate-fade-in [animation-delay:600ms] hover-scale">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Cari kost di area yang kamu inginkan..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-12 text-lg border-2 focus:border-blue-400 transition-all duration-300"
-                  />
-                </div>
-                <div className="flex-1">
-                  <Input
-                    placeholder="Lokasi (contoh: Jakarta, Bandung)"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="h-12 text-lg border-2 focus:border-blue-400 transition-all duration-300"
-                  />
-                </div>
-                <Button 
-                  size="lg" 
-                  className="h-12 px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105"
-                >
-                  <Search className="w-5 h-5 mr-2" />
-                  Cari Kost
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Enhanced Search Form */}
+          <div className="animate-fade-in [animation-delay:600ms]">
+            <SearchFilters onSearch={handleSearch} />
+          </div>
         </div>
 
         {/* Scroll indicator */}
@@ -175,6 +208,7 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
+              onClick={() => navigate('/auth')}
               className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg hover-scale"
             >
               Daftar Sebagai Pemilik

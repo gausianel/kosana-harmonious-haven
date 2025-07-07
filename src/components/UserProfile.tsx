@@ -1,0 +1,58 @@
+
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { User, Building2, LogOut, Settings } from "lucide-react";
+
+const UserProfile = () => {
+  const { user, profile, signOut } = useAuth();
+
+  if (!user || !profile) return null;
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          {profile.role === 'owner' ? (
+            <Building2 className="w-8 h-8 text-blue-600" />
+          ) : (
+            <User className="w-8 h-8 text-blue-600" />
+          )}
+        </div>
+        <CardTitle className="text-gray-800">{profile.full_name || 'Pengguna'}</CardTitle>
+        <Badge variant={profile.role === 'owner' ? 'default' : 'secondary'}>
+          {profile.role === 'owner' ? 'Pemilik Kost' : 'Pencari Kost'}
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="text-sm text-gray-600">
+          <p>Email: {user.email}</p>
+          {profile.phone && <p>Telepon: {profile.phone}</p>}
+        </div>
+        
+        <div className="flex flex-col gap-2">
+          <Button variant="outline" size="sm" className="w-full justify-start">
+            <Settings className="w-4 h-4 mr-2" />
+            Pengaturan
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleSignOut}
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Keluar
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default UserProfile;
