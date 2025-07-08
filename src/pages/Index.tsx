@@ -17,6 +17,7 @@ const Index = () => {
 
   // Redirect authenticated users based on their role
   useEffect(() => {
+    console.log('Index page - user:', user, 'profile:', profile, 'loading:', loading);
     if (!loading && user && profile) {
       if (profile.role === 'owner') {
         navigate('/dashboard');

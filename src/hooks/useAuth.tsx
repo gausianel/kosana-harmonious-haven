@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   profile: any;
   refreshProfile: () => Promise<void>;
+  updateProfile: (data: { full_name: string; phone: string }) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +24,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
 
+  const createProfile = async (userId: string, userData: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          full_name: userData.full_name || '',
+          role: userData.role || 'user'
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating profile:', error);
+        return;
+      }
+      
+      setProfile(data);
+    } catch (error) {
+      console.error('Error creating profile:', error);
+    }
+  };
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -31,7 +55,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq('id', userId)
         .single();
       
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData.user) {
+          await createProfile(userId, userData.user.user_metadata);
+        }
+        return;
+      }
+      
+      if (error) {
         console.error('Error fetching profile:', error);
         return;
       }
@@ -48,10 +81,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateProfile = async (data: { full_name: string; phone: string }) => {
+    if (!user) return { error: new Error('No user found') };
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          phone: data.phone
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        return { error };
+      }
+
+      // Refresh profile after update
+      await refreshProfile();
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { error };
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -69,6 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -119,7 +180,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signIn,
     signOut,
     profile,
-    refreshProfile
+    refreshProfile,
+    updateProfile
   };
 
   return (

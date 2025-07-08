@@ -12,7 +12,7 @@ import { ArrowLeft, User, Building2, Edit, Save, X, LogOut, Shield } from "lucid
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
-  const { user, profile, loading, refreshProfile, signOut } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -22,6 +22,7 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    console.log('Profile page - user:', user, 'profile:', profile, 'loading:', loading);
     if (!loading && !user) {
       navigate('/auth');
     }
@@ -37,12 +38,28 @@ const Profile = () => {
   }, [profile]);
 
   const handleSave = async () => {
-    // TODO: Implement profile update functionality
-    toast({
-      title: "Profil diperbarui",
-      description: "Data profil Anda berhasil disimpan"
-    });
-    setIsEditing(false);
+    try {
+      const { error } = await updateProfile(formData);
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Gagal memperbarui profil. Silakan coba lagi.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Profil diperbarui",
+          description: "Data profil Anda berhasil disimpan"
+        });
+        setIsEditing(false);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memperbarui profil.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSignOut = async () => {
@@ -73,8 +90,27 @@ const Profile = () => {
     );
   }
 
-  if (!user || !profile) {
-    return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Anda perlu login untuk mengakses halaman ini</p>
+          <Button onClick={() => navigate('/auth')}>Login</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading if profile is still being fetched
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat data profil...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -5,18 +5,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Building2, LogOut, Settings } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const UserProfile = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   if (!user || !profile) return null;
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+      toast({
+        title: "Berhasil logout",
+        description: "Anda telah keluar dari akun"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal logout. Silakan coba lagi.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleProfileClick = () => {
+    console.log('Navigating to profile page');
     navigate('/profile');
   };
 
