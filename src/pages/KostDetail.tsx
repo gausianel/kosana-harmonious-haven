@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,19 +43,35 @@ const KostDetail = () => {
     queryFn: async () => {
       if (!id) return [];
       
-      const { data, error } = await supabase
+      // First get the reviews
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
-        .select(`
-          *,
-          profiles (
-            full_name
-          )
-        `)
+        .select('*')
         .eq('kost_id', id)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (reviewsError) throw reviewsError;
+      
+      if (!reviewsData || reviewsData.length === 0) return [];
+      
+      // Get unique user IDs from reviews
+      const userIds = [...new Set(reviewsData.map(review => review.user_id))];
+      
+      // Get profiles for these users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+      
+      if (profilesError) throw profilesError;
+      
+      // Merge reviews with profiles
+      const reviewsWithProfiles = reviewsData.map(review => ({
+        ...review,
+        profiles: profilesData?.find(profile => profile.id === review.user_id) || null
+      }));
+      
+      return reviewsWithProfiles;
     },
     enabled: !!id
   });
