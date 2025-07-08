@@ -9,6 +9,7 @@ import { Users, Wifi, Car, Shield, Star, User, LogIn } from "lucide-react";
 import ImageCarousel from "@/components/ImageCarousel";
 import SearchFilters from "@/components/SearchFilters";
 import UserProfile from "@/components/UserProfile";
+import KostList from "@/components/KostList";
 
 const Index = () => {
   const { user, profile, loading } = useAuth();
@@ -140,8 +141,24 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Kost Listings Section */}
       <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Kost Pilihan Terbaik
+            </h2>
+            <p className="text-xl text-gray-600">
+              Temukan kost yang sesuai dengan kebutuhan dan budget Anda
+            </p>
+          </div>
+
+          <KostList />
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">

@@ -59,6 +59,51 @@ export type Database = {
           },
         ]
       }
+      kosts: {
+        Row: {
+          address: string
+          city: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          facilities: string[] | null
+          id: string
+          images: string[] | null
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          facilities?: string[] | null
+          id?: string
+          images?: string[] | null
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          facilities?: string[] | null
+          id?: string
+          images?: string[] | null
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -83,6 +128,54 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          kost_id: string
+          rating: number
+          room_id: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          kost_id: string
+          rating: number
+          room_id?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          kost_id?: string
+          rating?: number
+          room_id?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_kost_id_fkey"
+            columns: ["kost_id"]
+            isOneToOne: false
+            referencedRelation: "kosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           created_at: string
@@ -90,6 +183,7 @@ export type Database = {
           floor: number | null
           id: number
           image: string | null
+          kost_id: string | null
           price: number | null
           room_number: string | null
           status: string | null
@@ -100,6 +194,7 @@ export type Database = {
           floor?: number | null
           id?: number
           image?: string | null
+          kost_id?: string | null
           price?: number | null
           room_number?: string | null
           status?: string | null
@@ -110,11 +205,20 @@ export type Database = {
           floor?: number | null
           id?: number
           image?: string | null
+          kost_id?: string | null
           price?: number | null
           room_number?: string | null
           status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rooms_kost_id_fkey"
+            columns: ["kost_id"]
+            isOneToOne: false
+            referencedRelation: "kosts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
