@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, User, Building2, Edit, Save, X } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, User, Building2, Edit, Save, X, LogOut, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
-  const { user, profile, loading, refreshProfile } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -42,6 +43,23 @@ const Profile = () => {
       description: "Data profil Anda berhasil disimpan"
     });
     setIsEditing(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Berhasil logout",
+        description: "Anda telah keluar dari akun"
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal logout. Silakan coba lagi.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
@@ -87,10 +105,11 @@ const Profile = () => {
         <div className="max-w-2xl mx-auto">
           <div className="animate-fade-in">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Profil Saya</h2>
-            <p className="text-gray-600 mb-8">Kelola informasi profil Anda</p>
+            <p className="text-gray-600 mb-8">Kelola informasi profil dan pengaturan akun Anda</p>
           </div>
 
-          <Card className="shadow-lg animate-fade-in [animation-delay:200ms]">
+          {/* Profile Information Card */}
+          <Card className="shadow-lg animate-fade-in [animation-delay:200ms] mb-6">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 {profile.role === 'owner' ? (
@@ -191,6 +210,59 @@ const Profile = () => {
                     </Button>
                   </>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Account Settings Card */}
+          <Card className="shadow-lg animate-fade-in [animation-delay:400ms]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-gray-800">
+                <Shield className="w-5 h-5" />
+                Pengaturan Akun
+              </CardTitle>
+              <CardDescription>
+                Kelola pengaturan keamanan dan akun Anda
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium text-gray-800">Status Akun</p>
+                  <p className="text-sm text-gray-600">Akun Anda aktif dan terverifikasi</p>
+                </div>
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  Aktif
+                </Badge>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium text-gray-800">Bergabung Sejak</p>
+                  <p className="text-sm text-gray-600">
+                    {new Date(profile.created_at).toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="pt-4">
+                <Button 
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 hover:border-red-300"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Keluar dari Akun
+                </Button>
               </div>
             </CardContent>
           </Card>
