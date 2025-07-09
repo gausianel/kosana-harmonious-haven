@@ -204,7 +204,7 @@ const Dashboard = () => {
           {/* Welcome Section */}
           <div className="mb-8 animate-fade-in">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Selamat Datang, {profile.full_name}!
+              Dashboard Admin - Selamat Datang, {profile.full_name}!
             </h2>
             <p className="text-gray-600">
               Kelola properti kost Anda dengan mudah melalui dashboard ini

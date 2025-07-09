@@ -11,6 +11,7 @@ import SearchFilters from "@/components/SearchFilters";
 import UserProfile from "@/components/UserProfile";
 import KostList from "@/components/KostList";
 import TestimonialCard from "@/components/TestimonialCard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Index = () => {
   const { user, profile, loading } = useAuth();
@@ -92,6 +93,7 @@ const Index = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
               {user ? (
                 <Popover>
                   <PopoverTrigger asChild>
