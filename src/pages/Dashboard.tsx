@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Building2, Home, Users, DollarSign, User, LogOut, Settings, Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, Home, Users, DollarSign, User, LogOut, Settings, Plus, BarChart3 } from "lucide-react";
 import UserProfile from "@/components/UserProfile";
+import RoomManagement from "@/components/RoomManagement";
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
@@ -24,6 +26,10 @@ const Dashboard = () => {
       navigate('/');
     }
   }, [user, profile, loading, navigate]);
+
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   if (loading) {
     return (
@@ -57,8 +63,8 @@ const Dashboard = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => navigate('/')}
-                className="flex items-center gap-2"
+                onClick={handleHomeClick}
+                className="flex items-center gap-2 hover-scale"
               >
                 <Home className="w-4 h-4" />
                 Beranda
@@ -143,59 +149,104 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="hover-scale animate-fade-in [animation-delay:400ms]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="w-5 h-5" />
-                  Tambah Kamar Baru
-                </CardTitle>
-                <CardDescription>
-                  Tambahkan kamar kost baru ke properti Anda
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                  Tambah Kamar
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Main Dashboard Tabs */}
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="rooms">Kelola Kamar</TabsTrigger>
+              <TabsTrigger value="reports">Laporan</TabsTrigger>
+            </TabsList>
 
-            <Card className="hover-scale animate-fade-in [animation-delay:500ms]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Kelola Penghuni
-                </CardTitle>
-                <CardDescription>
-                  Lihat dan kelola data penghuni kost
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Lihat Penghuni
-                </Button>
-              </CardContent>
-            </Card>
+            <TabsContent value="overview" className="space-y-6">
+              {/* Action Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="hover-scale animate-fade-in [animation-delay:400ms]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Plus className="w-5 h-5" />
+                      Tambah Kamar Baru
+                    </CardTitle>
+                    <CardDescription>
+                      Tambahkan kamar kost baru ke properti Anda
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        const tabsTrigger = document.querySelector('[data-state="inactive"][value="rooms"]') as HTMLElement;
+                        if (tabsTrigger) tabsTrigger.click();
+                      }}
+                    >
+                      Kelola Kamar
+                    </Button>
+                  </CardContent>
+                </Card>
 
-            <Card className="hover-scale animate-fade-in [animation-delay:600ms]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
-                  Laporan Keuangan
-                </CardTitle>
-                <CardDescription>
-                  Lihat detail pendapatan dan pengeluaran
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Lihat Laporan
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                <Card className="hover-scale animate-fade-in [animation-delay:500ms]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Kelola Penghuni
+                    </CardTitle>
+                    <CardDescription>
+                      Lihat dan kelola data penghuni kost
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Lihat Penghuni
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover-scale animate-fade-in [animation-delay:600ms]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5" />
+                      Laporan Keuangan
+                    </CardTitle>
+                    <CardDescription>
+                      Lihat detail pendapatan dan pengeluaran
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        const tabsTrigger = document.querySelector('[data-state="inactive"][value="reports"]') as HTMLElement;
+                        if (tabsTrigger) tabsTrigger.click();
+                      }}
+                    >
+                      Lihat Laporan
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="rooms">
+              <RoomManagement />
+            </TabsContent>
+
+            <TabsContent value="reports" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Laporan Keuangan</CardTitle>
+                  <CardDescription>
+                    Fitur laporan keuangan akan segera hadir
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Laporan keuangan sedang dalam pengembangan</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

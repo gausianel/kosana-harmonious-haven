@@ -239,7 +239,7 @@ const Profile = () => {
                           phone: profile.phone || ''
                         });
                       }}
-                      className="flex-1"
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600"
                     >
                       <X className="w-4 h-4 mr-2" />
                       Batal
