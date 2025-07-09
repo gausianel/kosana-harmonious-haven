@@ -11,6 +11,7 @@ import { Building2, Home, Users, DollarSign, User, Plus, BarChart3, TrendingUp, 
 import UserProfile from "@/components/UserProfile";
 import RoomManagement from "@/components/RoomManagement";
 import KostManagement from "@/components/KostManagement";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardStats {
@@ -167,7 +168,7 @@ const Dashboard = () => {
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 KOSANA
               </h1>
-              <span className="ml-3 text-sm text-gray-500">Dashboard Pemilik</span>
+              <span className="ml-3 text-sm text-gray-500">Dashboard Admin</span>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -180,6 +181,7 @@ const Dashboard = () => {
                 <Eye className="w-4 h-4" />
                 <span className="hidden sm:inline">Lihat Tampilan User</span>
               </Button>
+              <LanguageSwitcher />
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">

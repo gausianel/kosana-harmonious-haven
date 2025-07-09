@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { Building2, MapPin, Phone, Mail, Plus, Edit, Wifi, Car, Shield } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Plus, Edit, Wifi, Car, Shield, Trash2 } from "lucide-react";
 import KostForm from './KostForm';
 
 const KostManagement = () => {
@@ -17,6 +18,8 @@ const KostManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingKost, setEditingKost] = useState<any>(null);
+  const [deletingKost, setDeletingKost] = useState<any>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchKosts = async () => {
     if (!user) return;
@@ -50,6 +53,44 @@ const KostManagement = () => {
     setShowForm(false);
     setEditingKost(null);
     fetchKosts();
+  };
+
+  const handleDelete = async (kost: any) => {
+    setDeleteLoading(true);
+    try {
+      // First delete all rooms associated with this kost
+      const { error: roomsError } = await supabase
+        .from('rooms')
+        .delete()
+        .eq('kost_id', kost.id);
+
+      if (roomsError) throw roomsError;
+
+      // Then delete the kost
+      const { error: kostError } = await supabase
+        .from('kosts')
+        .delete()
+        .eq('id', kost.id);
+
+      if (kostError) throw kostError;
+
+      toast({
+        title: "Berhasil!",
+        description: "Data kost berhasil dihapus",
+      });
+
+      fetchKosts();
+    } catch (error) {
+      console.error('Error deleting kost:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menghapus data kost",
+        variant: "destructive"
+      });
+    } finally {
+      setDeleteLoading(false);
+      setDeletingKost(null);
+    }
   };
 
   const getFacilityIcon = (facility: string) => {
@@ -143,25 +184,60 @@ const KostManagement = () => {
                       {kost.city}
                     </CardDescription>
                   </div>
-                  <Dialog open={editingKost?.id === kost.id} onOpenChange={(open) => !open && setEditingKost(null)}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setEditingKost(kost)}
-                        className="flex items-center gap-2"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Edit
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Edit Data Kost</DialogTitle>
-                      </DialogHeader>
-                      <KostForm existingKost={editingKost} onSuccess={handleFormSuccess} />
-                    </DialogContent>
-                  </Dialog>
+                  <div className="flex gap-2">
+                    <Dialog open={editingKost?.id === kost.id} onOpenChange={(open) => !open && setEditingKost(null)}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setEditingKost(kost)}
+                          className="flex items-center gap-2"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Edit Data Kost</DialogTitle>
+                        </DialogHeader>
+                        <KostForm existingKost={editingKost} onSuccess={handleFormSuccess} />
+                      </DialogContent>
+                    </Dialog>
+
+                    <AlertDialog open={deletingKost?.id === kost.id} onOpenChange={(open) => !open && setDeletingKost(null)}>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => setDeletingKost(kost)}
+                          className="flex items-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Hapus
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Hapus Data Kost</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Apakah Anda yakin ingin menghapus kost "{kost.name}"? 
+                            Tindakan ini akan menghapus semua data kamar yang terkait dan tidak dapat dibatalkan.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={deleteLoading}>Batal</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDelete(kost)}
+                            disabled={deleteLoading}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            {deleteLoading ? "Menghapus..." : "Hapus"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">

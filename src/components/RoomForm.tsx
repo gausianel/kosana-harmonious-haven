@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { X, Upload, Camera, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import FacilityChecklist from './FacilityChecklist';
 
 interface RoomFormProps {
   room?: any;
@@ -23,12 +23,11 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     floor: room?.floor || 1,
     price: room?.price || '',
     status: room?.status || 'available',
-    facilities: room?.facilities || '',
+    facilities: room?.facilities ? room.facilities.split(',').map((f: string) => f.trim()).filter((f: string) => f) : [],
     image: room?.image || ''
   });
   const [imagePreview, setImagePreview] = useState(room?.image || '');
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
   
   const { toast } = useToast();
 
@@ -36,6 +35,13 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleFacilitiesChange = (facilities: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      facilities
     }));
   };
 
@@ -117,13 +123,12 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     const roomData = {
       ...formData,
       price: Number(formData.price),
-      floor: Number(formData.floor)
+      floor: Number(formData.floor),
+      facilities: formData.facilities.join(', ') // Convert array back to string for database storage
     };
 
     onSubmit(roomData);
   };
-
-  const facilitiesList = formData.facilities.split(',').map(f => f.trim()).filter(f => f);
 
   return (
     <Card className="w-full max-w-2xl mx-auto animate-fade-in">
@@ -239,24 +244,11 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="facilities">Fasilitas Kamar</Label>
-            <Textarea
-              id="facilities"
-              value={formData.facilities}
-              onChange={(e) => handleInputChange('facilities', e.target.value)}
-              placeholder="Contoh: AC, WiFi, Tempat Tidur, Lemari, Meja Belajar (pisahkan dengan koma)"
-              rows={3}
-              className="transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+            <Label>Fasilitas Kamar</Label>
+            <FacilityChecklist
+              selectedFacilities={formData.facilities}
+              onFacilitiesChange={handleFacilitiesChange}
             />
-            {facilitiesList.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {facilitiesList.map((facility, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {facility}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="flex gap-3 pt-4">
