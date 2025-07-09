@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Home, Users, DollarSign, User, Plus, BarChart3, TrendingUp, Calendar, AlertCircle } from "lucide-react";
+import { Building2, Home, Users, DollarSign, User, Plus, BarChart3, TrendingUp, Calendar, AlertCircle, Eye } from "lucide-react";
 import UserProfile from "@/components/UserProfile";
 import RoomManagement from "@/components/RoomManagement";
+import KostManagement from "@/components/KostManagement";
 import { supabase } from '@/integrations/supabase/client';
 
 interface DashboardStats {
@@ -116,7 +117,7 @@ const Dashboard = () => {
     }
   }, [user, profile]);
 
-  const handleHomeClick = () => {
+  const handlePreviewClick = () => {
     navigate('/');
   };
 
@@ -130,6 +131,10 @@ const Dashboard = () => {
 
   const navigateToReports = () => {
     setActiveTab('reports');
+  };
+
+  const navigateToKosts = () => {
+    setActiveTab('kosts');
   };
 
   const navigateToTenants = () => {
@@ -169,11 +174,11 @@ const Dashboard = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={handleHomeClick}
+                onClick={handlePreviewClick}
                 className="flex items-center gap-2 hover-scale"
               >
-                <Home className="w-4 h-4" />
-                Beranda
+                <Eye className="w-4 h-4" />
+                <span className="hidden sm:inline">Lihat Tampilan User</span>
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
@@ -276,8 +281,9 @@ const Dashboard = () => {
 
           {/* Main Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="kosts">Kost Anda</TabsTrigger>
               <TabsTrigger value="rooms">Kelola Kamar</TabsTrigger>
               <TabsTrigger value="reports">Laporan</TabsTrigger>
             </TabsList>
@@ -288,6 +294,26 @@ const Dashboard = () => {
                 <Card className="hover-scale animate-fade-in [animation-delay:400ms] group">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 group-hover:text-blue-600 transition-colors">
+                      <Building2 className="w-5 h-5" />
+                      Kelola Kost
+                    </CardTitle>
+                    <CardDescription>
+                      Tambah atau edit informasi kost yang Anda miliki
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+                      onClick={navigateToKosts}
+                    >
+                      Kelola Kost
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover-scale animate-fade-in [animation-delay:500ms] group">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 group-hover:text-green-600 transition-colors">
                       <Plus className="w-5 h-5" />
                       Kelola Kamar
                     </CardTitle>
@@ -297,31 +323,11 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <Button 
-                      className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+                      variant="outline" 
+                      className="w-full border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all duration-300"
                       onClick={navigateToRooms}
                     >
                       Kelola Kamar
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover-scale animate-fade-in [animation-delay:500ms] group">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 group-hover:text-green-600 transition-colors">
-                      <Users className="w-5 h-5" />
-                      Kelola Penghuni
-                    </CardTitle>
-                    <CardDescription>
-                      Lihat dan kelola data penghuni kost Anda
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all duration-300"
-                      onClick={navigateToTenants}
-                    >
-                      Lihat Penghuni
                     </Button>
                   </CardContent>
                 </Card>
@@ -381,6 +387,10 @@ const Dashboard = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="kosts">
+              <KostManagement />
             </TabsContent>
 
             <TabsContent value="rooms">
