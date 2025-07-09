@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Wifi, Car, Shield, Star, User, LogIn } from "lucide-react";
-import ImageCarousel from "@/components/ImageCarousel";
+import { Users, Wifi, Car, Shield, User, LogIn, Search } from "lucide-react";
+import RoomImageCarousel from "@/components/RoomImageCarousel";
 import SearchFilters from "@/components/SearchFilters";
 import UserProfile from "@/components/UserProfile";
 import KostList from "@/components/KostList";
+import TestimonialCard from "@/components/TestimonialCard";
 
 const Index = () => {
   const { user, profile, loading } = useAuth();
@@ -30,6 +31,14 @@ const Index = () => {
     // TODO: Implement search functionality
   };
 
+  const handleStartSearch = () => {
+    // Scroll to search section or navigate to dedicated search page
+    const searchSection = document.getElementById('search-section');
+    if (searchSection) {
+      searchSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleOwnerSignup = () => {
     navigate('/auth');
   };
@@ -43,19 +52,19 @@ const Index = () => {
 
   const testimonials = [
     {
-      name: "Sarah",
+      name: "Sarah Amelia",
       rating: 5,
-      comment: "Kost yang nyaman dan bersih, fasilitas lengkap!"
+      comment: "Kost yang nyaman dan bersih, fasilitas lengkap! Pelayanan ramah dan lokasi strategis."
     },
     {
-      name: "Andi",
+      name: "Andi Pratama",
       rating: 5,
-      comment: "Pelayanan ramah, lokasi strategis dekat kampus."
+      comment: "Pelayanan ramah, lokasi strategis dekat kampus. Suasana nyaman untuk belajar."
     },
     {
-      name: "Maya",
+      name: "Maya Sari",
       rating: 4,
-      comment: "Harga terjangkau dengan kualitas terbaik."
+      comment: "Harga terjangkau dengan kualitas terbaik. Recommendasi banget untuk mahasiswa!"
     }
   ];
 
@@ -111,9 +120,9 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Hero Section with Background Gallery */}
+      {/* Hero Section with Room Gallery */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
-        <ImageCarousel />
+        <RoomImageCarousel />
         
         <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
           <div className="animate-fade-in">
@@ -121,16 +130,23 @@ const Index = () => {
               KOSANA
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in [animation-delay:200ms]">
-              Temukan Kost Impianmu dengan Mudah
+              Temukan Kamar Kost Impianmu dengan Mudah
             </p>
             <p className="text-lg text-white/80 mb-12 animate-fade-in [animation-delay:400ms]">
               Platform terpercaya untuk mencari dan menyewa kost terbaik di seluruh Indonesia
             </p>
           </div>
 
-          {/* Enhanced Search Form */}
-          <div className="animate-fade-in [animation-delay:600ms]">
-            <SearchFilters onSearch={handleSearch} />
+          {/* CTA Button */}
+          <div className="animate-fade-in [animation-delay:600ms] mb-8">
+            <Button 
+              size="lg" 
+              onClick={handleStartSearch}
+              className="bg-blue-600 hover:bg-blue-700 px-8 py-4 text-lg hover-scale flex items-center gap-3 mx-auto"
+            >
+              <Search className="w-5 h-5" />
+              Mulai Cari Kost
+            </Button>
           </div>
         </div>
 
@@ -138,6 +154,24 @@ const Index = () => {
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
             <div className="w-1 h-3 bg-white/70 rounded-full mx-auto animate-pulse"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Search Section */}
+      <section id="search-section" className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12 animate-fade-in">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Cari Kost Sesuai Kebutuhanmu
+            </h2>
+            <p className="text-xl text-gray-600">
+              Gunakan filter pencarian untuk menemukan kost yang sempurna
+            </p>
+          </div>
+          
+          <div className="animate-fade-in [animation-delay:200ms]">
+            <SearchFilters onSearch={handleSearch} />
           </div>
         </div>
       </section>
@@ -190,7 +224,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Enhanced Testimonials Section */}
       <section className="py-20 bg-gradient-to-r from-blue-50 to-purple-50 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 animate-fade-in">
@@ -198,23 +232,19 @@ const Index = () => {
               Kata Mereka Tentang KOSANA
             </h2>
             <p className="text-xl text-gray-600">
-              Testimoni dari penghuni kost yang puas
+              Testimoni dari penghuni kost yang puas dengan pelayanan kami
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="hover-scale animate-fade-in" style={{animationDelay: `${index * 200}ms`}}>
-                <CardContent className="p-6">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-600 mb-4 italic">"{testimonial.comment}"</p>
-                  <p className="font-semibold text-gray-800">- {testimonial.name}</p>
-                </CardContent>
-              </Card>
+              <TestimonialCard 
+                key={index}
+                name={testimonial.name}
+                rating={testimonial.rating}
+                comment={testimonial.comment}
+                index={index}
+              />
             ))}
           </div>
         </div>
@@ -232,8 +262,10 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg hover-scale"
+              onClick={handleStartSearch}
+              className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg hover-scale flex items-center gap-2"
             >
+              <Search className="w-5 h-5" />
               Mulai Cari Kost
             </Button>
             <Button 

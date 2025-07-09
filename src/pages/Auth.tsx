@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, User, Building2 } from "lucide-react";
+import { ArrowLeft, User, Building2, CheckCircle } from "lucide-react";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,9 +17,28 @@ const Auth = () => {
   const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(false);
   
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Handle role-based redirects after authentication
+  useEffect(() => {
+    if (user && profile) {
+      if (profile.role === 'owner') {
+        navigate('/dashboard');
+        toast({
+          title: "Selamat datang!",
+          description: "Anda telah berhasil masuk ke dashboard pemilik kost.",
+        });
+      } else {
+        navigate('/');
+        toast({
+          title: "Selamat datang!",
+          description: "Anda telah berhasil masuk ke KOSANA.",
+        });
+      }
+    }
+  }, [user, profile, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +53,6 @@ const Auth = () => {
             description: error.message,
             variant: "destructive"
           });
-        } else {
-          toast({
-            title: "Berhasil masuk",
-            description: "Selamat datang di KOSANA!"
-          });
-          // Redirection will be handled by the auth context
         }
       } else {
         const { error } = await signUp(email, password, fullName, role);
@@ -51,8 +64,9 @@ const Auth = () => {
           });
         } else {
           toast({
-            title: "Pendaftaran berhasil",
-            description: "Silakan periksa email Anda untuk verifikasi."
+            title: "Pendaftaran berhasil!",
+            description: "Silakan periksa email Anda untuk verifikasi. Setelah verifikasi, Anda akan diarahkan ke halaman yang sesuai.",
+            duration: 7000,
           });
         }
       }
@@ -74,7 +88,7 @@ const Auth = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="mb-4 text-gray-600 hover:text-gray-800"
+            className="mb-4 text-gray-600 hover:text-gray-800 hover-scale"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Kembali ke Beranda
@@ -87,9 +101,12 @@ const Auth = () => {
           </p>
         </div>
 
-        <Card className="shadow-lg animate-fade-in [animation-delay:200ms]">
+        <Card className="shadow-lg animate-fade-in [animation-delay:200ms] hover-scale">
           <CardHeader>
-            <CardTitle>{isLogin ? 'Masuk' : 'Daftar'}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              {isLogin ? 'Masuk' : 'Daftar'}
+              {!isLogin && <CheckCircle className="w-5 h-5 text-green-500" />}
+            </CardTitle>
             <CardDescription>
               {isLogin 
                 ? 'Masukkan email dan password Anda'
@@ -110,7 +127,7 @@ const Auth = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
-                      className="animate-fade-in"
+                      className="animate-fade-in transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   
@@ -121,7 +138,7 @@ const Auth = () => {
                         type="button"
                         variant={role === 'user' ? 'default' : 'outline'}
                         onClick={() => setRole('user')}
-                        className="flex items-center justify-center gap-2 hover-scale"
+                        className="flex items-center justify-center gap-2 hover-scale transition-all duration-300"
                       >
                         <User className="w-4 h-4" />
                         Pencari Kost
@@ -130,12 +147,17 @@ const Auth = () => {
                         type="button"
                         variant={role === 'owner' ? 'default' : 'outline'}
                         onClick={() => setRole('owner')}
-                        className="flex items-center justify-center gap-2 hover-scale"
+                        className="flex items-center justify-center gap-2 hover-scale transition-all duration-300"
                       >
                         <Building2 className="w-4 h-4" />
                         Pemilik Kost
                       </Button>
                     </div>
+                    {role === 'owner' && (
+                      <p className="text-xs text-blue-600 bg-blue-50 p-2 rounded-md animate-fade-in">
+                        Sebagai pemilik kost, Anda akan diarahkan ke dashboard untuk mengelola properti.
+                      </p>
+                    )}
                   </div>
                 </>
               )}
@@ -149,6 +171,7 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -161,15 +184,23 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 hover-scale"
+                className="w-full bg-blue-600 hover:bg-blue-700 hover-scale transition-all duration-300"
                 disabled={loading}
               >
-                {loading ? 'Memproses...' : (isLogin ? 'Masuk' : 'Daftar')}
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Memproses...
+                  </div>
+                ) : (
+                  isLogin ? 'Masuk' : 'Daftar'
+                )}
               </Button>
             </form>
 
@@ -177,7 +208,7 @@ const Auth = () => {
               <Button
                 variant="link"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600 hover:text-blue-800 hover-scale"
               >
                 {isLogin 
                   ? 'Belum punya akun? Daftar di sini'
