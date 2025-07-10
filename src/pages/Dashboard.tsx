@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, Calendar, DollarSign, Settings, LogOut } from "lucide-react";
+import { Building2, Users, Calendar, DollarSign, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import KostManagement from "@/components/KostManagement";
 import RoomManagement from "@/components/RoomManagement";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth(); // Changed from logout to signOut to match the auth context
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("kosts");
 
   useEffect(() => {
@@ -22,10 +24,19 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(); // Changed from logout to signOut
+      await signOut();
+      toast({
+        title: "Berhasil Logout",
+        description: "Anda telah berhasil keluar dari dashboard",
+      });
       navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat logout",
+        variant: "destructive"
+      });
     }
   };
 
@@ -51,14 +62,6 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/profile")}
-                className="flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Profil
-              </Button>
               <Button 
                 variant="outline" 
                 onClick={handleLogout}
