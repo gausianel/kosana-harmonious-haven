@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -7,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Building2, Home, Users, DollarSign, User, Plus, BarChart3, TrendingUp, Calendar, AlertCircle, Eye } from "lucide-react";
+import { Building2, Home, Users, DollarSign, User, Plus, BarChart3, TrendingUp, Calendar, AlertCircle, Eye, ArrowLeft } from "lucide-react";
 import UserProfile from "@/components/UserProfile";
 import RoomManagement from "@/components/RoomManagement";
 import KostManagement from "@/components/KostManagement";
@@ -160,27 +159,44 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+      {/* Enhanced Navigation with Clear Action Buttons */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 KOSANA
               </h1>
-              <span className="ml-3 text-sm text-gray-500">Dashboard Admin</span>
+              <span className="ml-3 text-sm text-gray-500 font-medium">Dashboard Owner</span>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={handlePreviewClick}
-                className="flex items-center gap-2 hover-scale"
-              >
-                <Eye className="w-4 h-4" />
-                <span className="hidden sm:inline">Lihat Tampilan User</span>
-              </Button>
+            {/* Enhanced Navigation Buttons */}
+            <div className="flex items-center space-x-3">
+              {/* Primary Action Buttons */}
+              <div className="flex items-center space-x-2 mr-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handlePreviewClick}
+                  className="flex items-center gap-2 border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 transition-all duration-200 font-medium"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span className="hidden sm:inline">Lihat Tampilan User</span>
+                  <span className="sm:hidden">Preview</span>
+                </Button>
+                
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition-all duration-200 font-medium"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Button>
+              </div>
+
+              {/* Language and Profile */}
               <LanguageSwitcher />
               <Popover>
                 <PopoverTrigger asChild>
@@ -203,12 +219,28 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <div className="mb-8 animate-fade-in">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Dashboard Admin - Selamat Datang, {profile.full_name}!
-            </h2>
-            <p className="text-gray-600">
-              Kelola properti kost Anda dengan mudah melalui dashboard ini
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                  Dashboard Admin - Selamat Datang, {profile.full_name}!
+                </h2>
+                <p className="text-gray-600">
+                  Kelola properti kost Anda dengan mudah melalui dashboard ini
+                </p>
+              </div>
+              
+              {/* Quick Navigation Helper */}
+              <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-500">
+                <span>Navigation:</span>
+                <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  Dashboard Owner
+                </Badge>
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+                <Badge variant="outline" className="text-green-600 border-green-300">
+                  Tampilan User
+                </Badge>
+              </div>
+            </div>
           </div>
 
           {/* Enhanced Stats Cards */}

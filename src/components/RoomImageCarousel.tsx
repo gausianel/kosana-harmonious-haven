@@ -53,22 +53,31 @@ const RoomImageCarousel = () => {
         </div>
       ))}
       
-      {/* Dots indicator with room info */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="flex flex-col items-center space-y-2">
-          <p className="text-white/80 text-sm text-center px-4">
-            {roomImages[currentIndex].alt}
-          </p>
-          <div className="flex space-x-2">
+      {/* Enhanced text overlay with better visibility */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="flex flex-col items-center space-y-4">
+          {/* Text with enhanced visibility */}
+          <div className="relative px-6 py-3 rounded-lg bg-black/60 backdrop-blur-sm border border-white/20">
+            <p className="text-white text-lg font-medium text-center max-w-md leading-relaxed drop-shadow-lg">
+              {roomImages[currentIndex].alt}
+            </p>
+            {/* Additional text outline effect */}
+            <p className="absolute inset-0 px-6 py-3 text-lg font-medium text-center max-w-md leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100 opacity-20 blur-sm">
+              {roomImages[currentIndex].alt}
+            </p>
+          </div>
+          
+          {/* Dots indicator */}
+          <div className="flex space-x-3">
             {roomImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={cn(
-                  "w-2 h-2 rounded-full transition-all duration-300",
+                  "w-3 h-3 rounded-full transition-all duration-300 border-2",
                   index === currentIndex 
-                    ? "bg-white scale-125" 
-                    : "bg-white/50 hover:bg-white/75"
+                    ? "bg-white border-white scale-125 shadow-lg" 
+                    : "bg-white/30 border-white/50 hover:bg-white/60 hover:border-white/80"
                 )}
               />
             ))}

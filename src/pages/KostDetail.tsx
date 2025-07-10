@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, MapPin, Phone, Mail, Star, Wifi, Car, Shield, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Mail, Star, Wifi, Car, Shield, Users, CreditCard, Calendar, MessageCircle } from "lucide-react";
 import ReviewCard from "@/components/ReviewCard";
 
 const KostDetail = () => {
@@ -124,6 +124,47 @@ const KostDetail = () => {
     } finally {
       setIsSubmittingReview(false);
     }
+  };
+
+  const handleBooking = () => {
+    if (!user) {
+      toast({
+        title: "Login diperlukan",
+        description: "Silakan login untuk melakukan booking",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+    
+    toast({
+      title: "Booking dimulai",
+      description: "Fitur booking akan segera tersedia!",
+    });
+  };
+
+  const handlePayment = () => {
+    if (!user) {
+      toast({
+        title: "Login diperlukan",
+        description: "Silakan login untuk melakukan pembayaran",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+    
+    toast({
+      title: "Proses pembayaran",
+      description: "Fitur pembayaran akan segera tersedia!",
+    });
+  };
+
+  const handleContact = () => {
+    toast({
+      title: "Menghubungi pemilik",
+      description: "Fitur kontak akan segera tersedia!",
+    });
   };
 
   if (kostLoading) {
@@ -329,11 +370,59 @@ const KostDetail = () => {
             </Card>
           </div>
 
-          {/* Sidebar */}
+          {/* Enhanced Sidebar with Clear Action Buttons */}
           <div className="space-y-6">
+            {/* Main Action Card */}
+            <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+              <CardHeader>
+                <CardTitle className="text-center text-xl font-bold text-blue-800">
+                  Tertarik dengan kost ini?
+                </CardTitle>
+                <CardDescription className="text-center">
+                  Booking sekarang atau lakukan pembayaran langsung
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Primary Action Buttons */}
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleBooking}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    size="lg"
+                  >
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Booking Sekarang
+                  </Button>
+                  
+                  <Button 
+                    onClick={handlePayment}
+                    variant="outline" 
+                    className="w-full border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-semibold py-3 text-lg shadow-md hover:shadow-lg transition-all duration-300"
+                    size="lg"
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Bayar Langsung
+                  </Button>
+                </div>
+
+                {/* Secondary Action */}
+                <div className="pt-2 border-t">
+                  <Button 
+                    onClick={handleContact}
+                    variant="ghost" 
+                    className="w-full text-blue-600 hover:bg-blue-50 font-medium"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Hubungi Pemilik
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Information Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Kontak</CardTitle>
+                <CardTitle>Informasi Kontak</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {kost.contact_phone && (
@@ -348,9 +437,11 @@ const KostDetail = () => {
                     <span className="text-sm">{kost.contact_email}</span>
                   </div>
                 )}
-                <Button className="w-full bg-green-600 hover:bg-green-700 mt-4">
-                  Hubungi Pemilik
-                </Button>
+                {(!kost.contact_phone && !kost.contact_email) && (
+                  <p className="text-gray-500 text-sm">
+                    Informasi kontak akan tersedia setelah booking
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
