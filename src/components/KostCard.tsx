@@ -8,7 +8,7 @@ interface KostCardProps {
   kost: {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     address: string;
     city: string;
     facilities: string[];
