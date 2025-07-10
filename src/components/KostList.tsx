@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import KostCard from './KostCard';
 
@@ -24,6 +24,7 @@ interface Kost {
 const KostList = () => {
   const [kosts, setKosts] = useState<Kost[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchKosts();
@@ -76,6 +77,10 @@ const KostList = () => {
     }
   };
 
+  const handleViewDetails = (kostId: string) => {
+    navigate(`/kost/${kostId}`);
+  };
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -97,7 +102,11 @@ const KostList = () => {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {kosts.map((kost) => (
-        <KostCard key={kost.id} kost={kost} />
+        <KostCard 
+          key={kost.id} 
+          kost={kost} 
+          onViewDetails={handleViewDetails}
+        />
       ))}
     </div>
   );
