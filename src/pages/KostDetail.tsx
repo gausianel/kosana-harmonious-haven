@@ -284,10 +284,14 @@ const KostDetail = () => {
                           </div>
                         </div>
 
-                        {/* Room Images */}
-                        {room.images && room.images.length > 0 && (
+                        {/* Room Images - Updated to handle single image from database */}
+                        {room.image && (
                           <div className="mb-3">
-                            <RoomImageCarousel images={room.images} />
+                            <img 
+                              src={room.image} 
+                              alt={`Kamar ${room.room_number}`}
+                              className="w-full h-48 object-cover rounded-lg"
+                            />
                           </div>
                         )}
 

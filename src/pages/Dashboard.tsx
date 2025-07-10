@@ -10,7 +10,7 @@ import KostManagement from "@/components/KostManagement";
 import RoomManagement from "@/components/RoomManagement";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth(); // Changed from logout to signOut to match the auth context
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("kosts");
 
@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut(); // Changed from logout to signOut
       navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);

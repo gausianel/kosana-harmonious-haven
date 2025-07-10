@@ -18,8 +18,9 @@ interface Room {
   price: number;
   status: string;
   facilities: string;
-  images: string[];
+  image: string; // Changed from images array to single image string to match database schema
   kost_id: string;
+  created_at: string;
 }
 
 interface Kost {
@@ -92,7 +93,14 @@ const RoomManagement = () => {
         .order('room_number');
 
       if (error) throw error;
-      setRooms(data || []);
+      
+      // Transform the data to match our Room interface
+      const transformedData = (data || []).map(room => ({
+        ...room,
+        image: room.image || '', // Ensure image is a string
+      }));
+      
+      setRooms(transformedData);
     } catch (error) {
       console.error('Error fetching rooms:', error);
       toast({
@@ -337,7 +345,7 @@ const RoomManagement = () => {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Image className="w-4 h-4" />
-                          <span className="text-sm">{room.images?.length || 0}</span>
+                          <span className="text-sm">{room.image ? '1' : '0'}</span>
                         </div>
                       </TableCell>
                       <TableCell>
