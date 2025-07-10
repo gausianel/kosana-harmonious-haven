@@ -12,7 +12,7 @@ interface KostCardProps {
     address: string;
     city: string;
     facilities?: string[];
-    images: string[];
+    images?: string[];
     contact_phone?: string;
     contact_email?: string;
   };
