@@ -16,12 +16,19 @@ const UserProfile = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log('UserProfile: Starting logout process...');
       await signOut();
+      console.log('UserProfile: Sign out successful, navigating to home...');
+      
       toast({
         title: "Berhasil logout",
         description: "Anda telah keluar dari akun"
       });
+      
+      // Navigate to home page
+      navigate("/", { replace: true });
     } catch (error) {
+      console.error('UserProfile: Logout error:', error);
       toast({
         title: "Error",
         description: "Gagal logout. Silakan coba lagi.",

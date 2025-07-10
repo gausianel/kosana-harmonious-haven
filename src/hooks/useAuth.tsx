@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -169,18 +168,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error);
-        throw error;
-      }
-      // Clear local state
+      console.log('Attempting to sign out...');
+      
+      // Clear local state first to prevent UI issues
       setUser(null);
       setSession(null);
       setProfile(null);
+      
+      // Then call Supabase signOut
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Supabase logout error:', error);
+        // Even if there's an error, we've cleared local state
+        // This handles cases where session might be expired
+      }
+      
+      console.log('Logout completed successfully');
     } catch (error) {
       console.error('Sign out error:', error);
-      throw error;
+      // Even if there's an error, clear local state
+      setUser(null);
+      setSession(null);
+      setProfile(null);
     }
   };
 

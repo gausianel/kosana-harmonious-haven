@@ -11,7 +11,7 @@ import RoomManagement from "@/components/RoomManagement";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("kosts");
@@ -24,12 +24,17 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
+      console.log('Starting logout process...');
       await signOut();
+      console.log('Sign out successful, navigating to home...');
+      
       toast({
         title: "Berhasil Logout",
         description: "Anda telah berhasil keluar dari dashboard",
       });
-      navigate("/");
+      
+      // Navigate to home page instead of auth page
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error logging out:", error);
       toast({
