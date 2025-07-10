@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, Upload, Camera, Check } from "lucide-react";
+import { X, Upload, Camera, Check, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import FacilityChecklist from './FacilityChecklist';
 
@@ -24,10 +24,10 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     price: room?.price || '',
     status: room?.status || 'available',
     facilities: room?.facilities ? room.facilities.split(',').map((f: string) => f.trim()).filter((f: string) => f) : [],
-    image: room?.image || ''
+    images: room?.images || []
   });
-  const [imagePreview, setImagePreview] = useState(room?.image || '');
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(room?.images || []);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   
   const { toast } = useToast();
 
@@ -46,42 +46,43 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "File harus berupa gambar",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "Ukuran file maksimal 5MB",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setImageFile(file);
+    const files = Array.from(event.target.files || []);
     
-    // Create preview URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setImagePreview(result);
-      setFormData(prev => ({
-        ...prev,
-        image: result
-      }));
-    };
-    reader.readAsDataURL(file);
+    for (const file of files) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "File harus berupa gambar",
+          variant: "destructive"
+        });
+        continue;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "Ukuran file maksimal 5MB",
+          variant: "destructive"
+        });
+        continue;
+      }
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreviews(prev => [...prev, result]);
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, result]
+        }));
+      };
+      reader.readAsDataURL(file);
+      
+      setImageFiles(prev => [...prev, file]);
+    }
 
     toast({
       title: "Gambar berhasil dipilih",
@@ -89,12 +90,12 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     });
   };
 
-  const removeImage = () => {
-    setImagePreview('');
-    setImageFile(null);
+  const removeImage = (index: number) => {
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
     setFormData(prev => ({
       ...prev,
-      image: ''
+      images: prev.images.filter((_, i) => i !== index)
     }));
   };
 
@@ -140,47 +141,53 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload Section */}
+          {/* Multiple Images Upload Section */}
           <div className="space-y-3">
-            <Label htmlFor="image">Foto Kamar</Label>
+            <Label htmlFor="images">Foto Kamar (Multiple)</Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-              {imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Preview kamar"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={removeImage}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                  <Badge className="absolute bottom-2 left-2 bg-green-500">
-                    <Check className="w-3 h-3 mr-1" />
-                    Gambar dipilih
-                  </Badge>
+              <div className="space-y-3">
+                <Upload className="w-12 h-12 text-gray-400 mx-auto" />
+                <div>
+                  <p className="text-gray-600">Klik untuk upload foto kamar</p>
+                  <p className="text-sm text-gray-500">PNG, JPG hingga 5MB per file</p>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-                  <div>
-                    <p className="text-gray-600">Klik untuk upload foto kamar</p>
-                    <p className="text-sm text-gray-500">PNG, JPG hingga 5MB</p>
-                  </div>
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
             </div>
+
+            {/* Image Previews */}
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeImage(index)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                    <Badge className="absolute bottom-2 left-2 bg-green-500 text-xs">
+                      <Check className="w-2 h-2 mr-1" />
+                      {index + 1}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

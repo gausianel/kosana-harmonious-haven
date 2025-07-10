@@ -5,15 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, Eye, Home } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Home, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/useAuth';
+import RoomForm from './RoomForm';
 
 interface Room {
   id: number;
@@ -22,7 +18,7 @@ interface Room {
   price: number;
   status: string;
   facilities: string;
-  image: string;
+  images: string[];
   kost_id: string;
 }
 
@@ -42,15 +38,6 @@ const RoomManagement = () => {
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
-  const [formData, setFormData] = useState({
-    room_number: '',
-    floor: 1,
-    price: 0,
-    status: 'available',
-    facilities: '',
-    image: '',
-    kost_id: ''
-  });
 
   const statusOptions = [
     { value: 'available', label: 'Tersedia', color: 'bg-green-100 text-green-800' },
@@ -118,22 +105,18 @@ const RoomManagement = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRoomSubmit = async (roomData: any) => {
     setLoading(true);
-
     try {
-      const roomData = {
-        ...formData,
-        kost_id: selectedKost,
-        price: Number(formData.price),
-        floor: Number(formData.floor)
+      const finalRoomData = {
+        ...roomData,
+        kost_id: selectedKost
       };
 
       if (editingRoom) {
         const { error } = await supabase
           .from('rooms')
-          .update(roomData)
+          .update(finalRoomData)
           .eq('id', editingRoom.id);
 
         if (error) throw error;
@@ -144,7 +127,7 @@ const RoomManagement = () => {
       } else {
         const { error } = await supabase
           .from('rooms')
-          .insert([roomData]);
+          .insert([finalRoomData]);
 
         if (error) throw error;
         toast({
@@ -155,7 +138,6 @@ const RoomManagement = () => {
 
       setIsDialogOpen(false);
       setEditingRoom(null);
-      resetForm();
       fetchRooms();
     } catch (error) {
       console.error('Error saving room:', error);
@@ -217,29 +199,8 @@ const RoomManagement = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      room_number: '',
-      floor: 1,
-      price: 0,
-      status: 'available',
-      facilities: '',
-      image: '',
-      kost_id: ''
-    });
-  };
-
   const openEditDialog = (room: Room) => {
     setEditingRoom(room);
-    setFormData({
-      room_number: room.room_number || '',
-      floor: room.floor || 1,
-      price: room.price || 0,
-      status: room.status || 'available',
-      facilities: room.facilities || '',
-      image: room.image || '',
-      kost_id: room.kost_id
-    });
     setIsDialogOpen(true);
   };
 
@@ -265,14 +226,13 @@ const RoomManagement = () => {
               className="bg-blue-600 hover:bg-blue-700"
               onClick={() => {
                 setEditingRoom(null);
-                resetForm();
               }}
             >
               <Plus className="w-4 h-4 mr-2" />
               Tambah Kamar
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingRoom ? 'Edit Kamar' : 'Tambah Kamar Baru'}
@@ -281,80 +241,12 @@ const RoomManagement = () => {
                 {editingRoom ? 'Perbarui informasi kamar' : 'Tambahkan kamar baru ke properti kost Anda'}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="room_number">Nomor Kamar</Label>
-                <Input
-                  id="room_number"
-                  value={formData.room_number}
-                  onChange={(e) => setFormData({...formData, room_number: e.target.value})}
-                  placeholder="Contoh: A01, B12"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="floor">Lantai</Label>
-                <Input
-                  id="floor"
-                  type="number"
-                  value={formData.floor}
-                  onChange={(e) => setFormData({...formData, floor: parseInt(e.target.value)})}
-                  min="1"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="price">Harga per Bulan (Rp)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: parseInt(e.target.value)})}
-                  min="0"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={formData.status} 
-                  onValueChange={(value) => setFormData({...formData, status: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="facilities">Fasilitas</Label>
-                <Textarea
-                  id="facilities"
-                  value={formData.facilities}
-                  onChange={(e) => setFormData({...formData, facilities: e.target.value})}
-                  placeholder="AC, Wi-Fi, Kamar Mandi Dalam, dll"
-                  rows={3}
-                />
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Batal
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Menyimpan...' : editingRoom ? 'Perbarui' : 'Tambah'}
-                </Button>
-              </div>
-            </form>
+            <RoomForm
+              room={editingRoom}
+              onSubmit={handleRoomSubmit}
+              onCancel={() => setIsDialogOpen(false)}
+              loading={loading}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -366,21 +258,17 @@ const RoomManagement = () => {
             <CardTitle className="text-lg">Pilih Properti Kost</CardTitle>
           </CardHeader>
           <CardContent>
-            <Select value={selectedKost} onValueChange={setSelectedKost}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih kost untuk dikelola" />
-              </SelectTrigger>
-              <SelectContent>
-                {kosts.map((kost) => (
-                  <SelectItem key={kost.id} value={kost.id}>
-                    <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4" />
-                      <span>{kost.name} - {kost.city}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select 
+              value={selectedKost} 
+              onChange={(e) => setSelectedKost(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              {kosts.map((kost) => (
+                <option key={kost.id} value={kost.id}>
+                  {kost.name} - {kost.city}
+                </option>
+              ))}
+            </select>
           </CardContent>
         </Card>
       )}
@@ -405,7 +293,6 @@ const RoomManagement = () => {
                 <p className="text-gray-600 mb-4">Belum ada kamar yang ditambahkan</p>
                 <Button onClick={() => {
                   setEditingRoom(null);
-                  resetForm();
                   setIsDialogOpen(true);
                 }}>
                   <Plus className="w-4 h-4 mr-2" />
@@ -421,6 +308,7 @@ const RoomManagement = () => {
                     <TableHead>Harga</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Fasilitas</TableHead>
+                    <TableHead>Gambar</TableHead>
                     <TableHead>Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -431,24 +319,26 @@ const RoomManagement = () => {
                       <TableCell>{room.floor}</TableCell>
                       <TableCell>Rp {room.price?.toLocaleString('id-ID')}</TableCell>
                       <TableCell>
-                        <Select 
+                        <select 
                           value={room.status} 
-                          onValueChange={(value) => handleStatusChange(room.id, value)}
+                          onChange={(e) => handleStatusChange(room.id, e.target.value)}
+                          className="border border-gray-300 rounded px-2 py-1 text-sm"
                         >
-                          <SelectTrigger className="w-32">
-                            <SelectValue>{getStatusBadge(room.status)}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {statusOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
                       </TableCell>
                       <TableCell className="max-w-32 truncate">
                         {room.facilities || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Image className="w-4 h-4" />
+                          <span className="text-sm">{room.images?.length || 0}</span>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
