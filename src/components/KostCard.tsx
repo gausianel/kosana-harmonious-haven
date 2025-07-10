@@ -11,7 +11,7 @@ interface KostCardProps {
     description?: string;
     address: string;
     city: string;
-    facilities: string[];
+    facilities?: string[];
     images: string[];
     contact_phone?: string;
     contact_email?: string;
