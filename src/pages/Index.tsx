@@ -21,6 +21,20 @@ const Index = () => {
     facilities: [] as string[]
   });
 
+  const handleSearch = (searchFilters: any) => {
+    console.log('Search filters:', searchFilters);
+    // Update search term and filters based on the search
+    if (searchFilters.query) {
+      setSearchTerm(searchFilters.query);
+    }
+    if (searchFilters.location) {
+      setFilters(prev => ({ ...prev, city: searchFilters.location }));
+    }
+    if (searchFilters.facilities) {
+      setFilters(prev => ({ ...prev, facilities: searchFilters.facilities }));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -119,6 +133,7 @@ const Index = () => {
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <SearchFilters 
+            onSearch={handleSearch}
             filters={filters}
             onFiltersChange={setFilters}
           />
