@@ -4,16 +4,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, Calendar, DollarSign, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Building2, Users, Calendar, DollarSign } from "lucide-react";
 import KostManagement from "@/components/KostManagement";
 import RoomManagement from "@/components/RoomManagement";
-import { useToast } from "@/hooks/use-toast";
+import OwnerProfilePopup from "@/components/OwnerProfilePopup";
 
 const Dashboard = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("kosts");
 
   useEffect(() => {
@@ -21,29 +19,6 @@ const Dashboard = () => {
       navigate("/auth");
     }
   }, [user, navigate]);
-
-  const handleLogout = async () => {
-    try {
-      console.log('Starting logout process...');
-      await signOut();
-      console.log('Sign out successful, navigating to home...');
-      
-      toast({
-        title: "Berhasil Logout",
-        description: "Anda telah berhasil keluar dari dashboard",
-      });
-      
-      // Navigate to home page instead of auth page
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("Error logging out:", error);
-      toast({
-        title: "Error",
-        description: "Terjadi kesalahan saat logout",
-        variant: "destructive"
-      });
-    }
-  };
 
   if (!user) {
     return (
@@ -67,14 +42,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                Keluar
-              </Button>
+              <OwnerProfilePopup />
             </div>
           </div>
         </div>

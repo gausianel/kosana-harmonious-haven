@@ -4,14 +4,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, MapPin, Phone, Mail, Wifi, Car, Shield, Calendar, CreditCard, Home, Users, Star } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, MapPin, Phone, Mail, Wifi, Car, Shield, Calendar, CreditCard, Home, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import ImageCarousel from '@/components/ImageCarousel';
-import RoomImageCarousel from '@/components/RoomImageCarousel';
 import BookingForm from '@/components/BookingForm';
+import StarRating from '@/components/StarRating';
 
 const KostDetail = () => {
   const { id } = useParams();
@@ -127,6 +127,13 @@ const KostDetail = () => {
       title: "Booking Berhasil!",
       description: "Booking Anda telah berhasil dibuat. Silakan lanjutkan pembayaran.",
     });
+  };
+
+  // Simulasi rating untuk setiap kamar (dalam implementasi nyata, ini akan diambil dari database)
+  const getRoomRating = (roomId: number) => {
+    // Simulasi rating antara 3.5 - 5.0
+    const ratings = [4.2, 4.7, 3.8, 4.5, 4.1, 4.9, 3.9, 4.3, 4.6, 4.0];
+    return ratings[roomId % ratings.length] || 4.0;
   };
 
   if (loading) {
@@ -270,10 +277,17 @@ const KostDetail = () => {
                 ) : (
                   <div className="grid gap-4">
                     {rooms.map((room) => (
-                      <div key={room.id} className="border rounded-lg p-4">
+                      <div key={room.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-semibold text-lg">Kamar {room.room_number}</h4>
+                            <div className="flex items-center gap-3 mb-1">
+                              <h4 className="font-semibold text-lg">Kamar {room.room_number}</h4>
+                              <StarRating 
+                                rating={getRoomRating(room.id)} 
+                                size="sm"
+                                className="bg-white px-2 py-1 rounded-full shadow-sm border"
+                              />
+                            </div>
                             <p className="text-gray-600">Lantai {room.floor}</p>
                           </div>
                           <div className="text-right">
@@ -284,7 +298,7 @@ const KostDetail = () => {
                           </div>
                         </div>
 
-                        {/* Room Images - Updated to handle single image from database */}
+                        {/* Room Images */}
                         {room.image && (
                           <div className="mb-3">
                             <img 
@@ -345,10 +359,7 @@ const KostDetail = () => {
                 {averageRating > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Rating</span>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold">{averageRating.toFixed(1)}</span>
-                    </div>
+                    <StarRating rating={averageRating} size="sm" />
                   </div>
                 )}
               </CardContent>
@@ -363,18 +374,7 @@ const KostDetail = () => {
                 <CardContent className="space-y-4">
                   {reviews.slice(0, 3).map((review) => (
                     <div key={review.id} className="border-b pb-3 last:border-b-0">
-                      <div className="flex items-center gap-1 mb-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`w-3 h-3 ${
-                              star <= review.rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
+                      <StarRating rating={review.rating} size="sm" showNumber={false} className="mb-1" />
                       <p className="text-sm text-gray-600 mb-1">{review.comment}</p>
                       <p className="text-xs text-gray-500">
                         {review.profiles?.full_name || 'Anonymous'}

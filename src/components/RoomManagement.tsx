@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Eye, Home, Image } from "lucide-react";
+import { Plus, Edit, Trash2, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/useAuth';
 import RoomForm from './RoomForm';
@@ -18,7 +17,7 @@ interface Room {
   price: number;
   status: string;
   facilities: string;
-  image: string; // Changed from images array to single image string to match database schema
+  image: string;
   kost_id: string;
   created_at: string;
 }
@@ -43,7 +42,7 @@ const RoomManagement = () => {
   const statusOptions = [
     { value: 'available', label: 'Tersedia', color: 'bg-green-100 text-green-800' },
     { value: 'booked', label: 'Dibooking', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'occupied', label: 'Penuh', color: 'bg-red-100 text-red-800' },
+    { value: 'occupied', label: 'Terisi', color: 'bg-red-100 text-red-800' },
     { value: 'maintenance', label: 'Perbaikan', color: 'bg-gray-100 text-gray-800' }
   ];
 
@@ -375,6 +374,26 @@ const RoomManagement = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Dialog untuk form room */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingRoom ? 'Edit Kamar' : 'Tambah Kamar Baru'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingRoom ? 'Perbarui informasi kamar' : 'Tambahkan kamar baru ke properti kost Anda'}
+            </DialogDescription>
+          </DialogHeader>
+          <RoomForm
+            room={editingRoom}
+            onSubmit={handleRoomSubmit}
+            onCancel={() => setIsDialogOpen(false)}
+            loading={loading}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

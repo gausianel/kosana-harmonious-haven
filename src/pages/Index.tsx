@@ -1,286 +1,235 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Wifi, Car, Shield, User, LogIn, Search } from "lucide-react";
-import RoomImageCarousel from "@/components/RoomImageCarousel";
-import SearchFilters from "@/components/SearchFilters";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Star, Users, Building2, Search, Filter, Heart, Shield, Wifi } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import UserProfile from "@/components/UserProfile";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import KostList from "@/components/KostList";
-import TestimonialCard from "@/components/TestimonialCard";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import SearchFilters from "@/components/SearchFilters";
 
 const Index = () => {
-  const { user, profile, loading } = useAuth();
-  const navigate = useNavigate();
-
-  // Redirect authenticated users based on their role
-  useEffect(() => {
-    console.log('Index page - user:', user, 'profile:', profile, 'loading:', loading);
-    if (!loading && user && profile) {
-      if (profile.role === 'owner') {
-        navigate('/dashboard');
-      }
-    }
-  }, [user, profile, loading, navigate]);
-
-  const handleSearch = (filters: any) => {
-    console.log('Search filters:', filters);
-    // TODO: Implement search functionality
-  };
-
-  const handleStartSearch = () => {
-    // Scroll to search section or navigate to dedicated search page
-    const searchSection = document.getElementById('search-section');
-    if (searchSection) {
-      searchSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleOwnerSignup = () => {
-    navigate('/auth');
-  };
-
-  const features = [
-    { icon: Wifi, title: "WiFi Gratis", description: "Internet cepat 24/7" },
-    { icon: Car, title: "Parkir Aman", description: "Area parkir terjaga" },
-    { icon: Shield, title: "Keamanan", description: "CCTV & security" },
-    { icon: Users, title: "Komunitas", description: "Lingkungan ramah" }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Amelia",
-      rating: 5,
-      comment: "Kost yang nyaman dan bersih, fasilitas lengkap! Pelayanan ramah dan lokasi strategis."
-    },
-    {
-      name: "Andi Pratama",
-      rating: 5,
-      comment: "Pelayanan ramah, lokasi strategis dekat kampus. Suasana nyaman untuk belajar."
-    },
-    {
-      name: "Maya Sari",
-      rating: 4,
-      comment: "Harga terjangkau dengan kualitas terbaik. Recommendasi banget untuk mahasiswa!"
-    }
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat...</p>
-        </div>
-      </div>
-    );
-  }
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    city: "",
+    minPrice: "",
+    maxPrice: "",
+    facilities: [] as string[]
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                KOSANA
-              </h1>
+              <Building2 className="h-8 w-8 text-blue-600 mr-3" />
+              <h1 className="text-2xl font-bold text-gray-900">KostHub</h1>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <LanguageSwitcher />
+            <div className="flex items-center gap-4">
               {user ? (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2 hover-scale">
-                      <User className="w-4 h-4" />
-                      <span className="hidden sm:inline">Profil</span>
+                <div className="flex items-center gap-3">
+                  <Link to="/dashboard">
+                    <Button variant="outline" size="sm">
+                      Dashboard
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80 p-0" align="end">
-                    <UserProfile />
-                  </PopoverContent>
-                </Popover>
+                  </Link>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                          <Users className="w-4 h-4 text-blue-600" />
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                      <UserProfile />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               ) : (
-                <Button 
-                  onClick={() => navigate('/auth')}
-                  variant="ghost" 
-                  size="sm"
-                  className="flex items-center gap-2 hover-scale"
-                >
-                  <LogIn className="w-4 h-4" />
-                  Masuk
-                </Button>
+                <Link to="/auth">
+                  <Button>
+                    Masuk / Daftar
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section with Room Gallery */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
-        <RoomImageCarousel />
-        
-        <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
-          <div className="animate-fade-in">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 animate-scale-in">
-              KOSANA
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in [animation-delay:200ms]">
-              Temukan Kamar Kost Impianmu dengan Mudah
-            </p>
-            <p className="text-lg text-white/80 mb-12 animate-fade-in [animation-delay:400ms]">
-              Platform terpercaya untuk mencari dan menyewa kost terbaik di seluruh Indonesia
-            </p>
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            Temukan <span className="text-blue-600">Kost Impian</span> Anda
+          </h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Platform terpercaya untuk mencari kost nyaman, aman, dan terjangkau di seluruh Indonesia
+          </p>
+          
+          {/* Search Bar */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Cari kost berdasarkan nama atau lokasi..."
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">
+                <Search className="w-5 h-5 mr-2" />
+                Cari Kost
+              </Button>
+            </div>
           </div>
 
-          {/* CTA Button */}
-          <div className="animate-fade-in [animation-delay:600ms] mb-8">
-            <Button 
-              size="lg" 
-              onClick={handleStartSearch}
-              className="bg-blue-600 hover:bg-blue-700 px-8 py-4 text-lg hover-scale flex items-center gap-3 mx-auto"
-            >
-              <Search className="w-5 h-5" />
-              Mulai Cari Kost
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="text-3xl font-bold text-blue-600 mb-2">1000+</div>
+              <div className="text-gray-600">Kost Tersedia</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="text-3xl font-bold text-green-600 mb-2">50+</div>
+              <div className="text-gray-600">Kota Terjangkau</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="text-3xl font-bold text-purple-600 mb-2">10k+</div>
+              <div className="text-gray-600">Penyewa Puas</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filters */}
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <SearchFilters 
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
+        </div>
+      </section>
+
+      {/* Kost List */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-2xl font-bold text-gray-900">Kost Terbaru</h3>
+            <Button variant="outline">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter Lainnya
             </Button>
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
-            <div className="w-1 h-3 bg-white/70 rounded-full mx-auto animate-pulse"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Search Section */}
-      <section id="search-section" className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 animate-fade-in">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Cari Kost Sesuai Kebutuhanmu
-            </h2>
-            <p className="text-xl text-gray-600">
-              Gunakan filter pencarian untuk menemukan kost yang sempurna
-            </p>
-          </div>
           
-          <div className="animate-fade-in [animation-delay:200ms]">
-            <SearchFilters onSearch={handleSearch} />
-          </div>
-        </div>
-      </section>
-
-      {/* Kost Listings Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Kost Pilihan Terbaik
-            </h2>
-            <p className="text-xl text-gray-600">
-              Temukan kost yang sesuai dengan kebutuhan dan budget Anda
-            </p>
-          </div>
-
-          <KostList />
+          <KostList searchTerm={searchTerm} filters={filters} />
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Mengapa Memilih KOSANA?
-            </h2>
-            <p className="text-xl text-gray-600">
-              Fasilitas terbaik untuk kenyamanan hunian Anda
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Mengapa Memilih KostHub?
+            </h3>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Kami menyediakan platform terbaik untuk mencari dan mengelola kost
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center group hover-scale animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
-                <CardHeader>
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-gray-800">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-blue-600" />
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Terpercaya & Aman</h4>
+              <p className="text-gray-600">Semua kost telah diverifikasi dan terjamin keamanannya</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wifi className="w-8 h-8 text-green-600" />
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Fasilitas Lengkap</h4>
+              <p className="text-gray-600">Kost dengan fasilitas modern dan lengkap</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-purple-600" />
+              </div>
+              <h4 className="text-xl font-semibold mb-2">Pelayanan Prima</h4>
+              <p className="text-gray-600">Dukungan 24/7 untuk kepuasan Anda</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Testimonials Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-50 to-purple-50 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Kata Mereka Tentang KOSANA
-            </h2>
-            <p className="text-xl text-gray-600">
-              Testimoni dari penghuni kost yang puas dengan pelayanan kami
-            </p>
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center mb-4">
+                <Building2 className="h-8 w-8 text-blue-400 mr-3" />
+                <h3 className="text-xl font-bold">KostHub</h3>
+              </div>
+              <p className="text-gray-400">
+                Platform terpercaya untuk mencari kost impian Anda
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Layanan</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Cari Kost</li>
+                <li>Daftar Kost</li>
+                <li>Verifikasi</li>
+                <li>Bantuan</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Perusahaan</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>Tentang Kami</li>
+                <li>Karir</li>
+                <li>Blog</li>
+                <li>Kontak</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Dukungan</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>FAQ</li>
+                <li>Syarat & Ketentuan</li>
+                <li>Kebijakan Privasi</li>
+                <li>Bantuan</li>
+              </ul>
+            </div>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard 
-                key={index}
-                name={testimonial.name}
-                rating={testimonial.rating}
-                comment={testimonial.comment}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center animate-fade-in">
-          <h2 className="text-4xl font-bold text-gray-800 mb-6">
-            Siap Menemukan Kost Impianmu?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Bergabunglah dengan ribuan penghuni yang telah merasakan kenyamanan bersama KOSANA
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={handleStartSearch}
-              className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg hover-scale flex items-center gap-2"
-            >
-              <Search className="w-5 h-5" />
-              Mulai Cari Kost
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              onClick={handleOwnerSignup}
-              className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg hover-scale"
-            >
-              Daftar Sebagai Pemilik
-            </Button>
+          
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 KostHub. Semua hak dilindungi.</p>
           </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };
