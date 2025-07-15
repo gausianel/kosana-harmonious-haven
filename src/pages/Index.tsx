@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, Users, Building2, Search, Filter, Heart, Shield, Wifi } from "lucide-react";
+import { MapPin, Star, Users, Building2, Search, Heart, Shield, Wifi } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import UserProfile from "@/components/UserProfile";
@@ -112,15 +112,22 @@ const Index = () => {
           <div className="absolute top-0 left-0 w-full h-full">
             <img 
               src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Background" 
-              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-30"
+              alt="Kamar Kost Modern" 
+              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-40"
             />
           </div>
           <div className="absolute top-0 left-0 w-full h-full">
             <img 
               src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Background" 
-              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-20"
+              alt="Interior Kost Nyaman" 
+              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-30"
+            />
+          </div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Kamar Kost Minimalis" 
+              className="w-full h-full object-cover animate-[pan_30s_ease-in-out_infinite] opacity-25"
             />
           </div>
         </div>
@@ -151,10 +158,6 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-2xl font-bold text-gray-900">Kost Terbaru</h3>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter Lainnya
-            </Button>
           </div>
           
           <KostList searchTerm={searchTerm} filters={filters} />
