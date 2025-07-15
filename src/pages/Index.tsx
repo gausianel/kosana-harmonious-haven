@@ -10,6 +10,7 @@ import UserProfile from "@/components/UserProfile";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import KostList from "@/components/KostList";
 import SearchFilters from "@/components/SearchFilters";
+import TestimonialCard from "@/components/TestimonialCard";
 
 const Index = () => {
   const { user } = useAuth();
@@ -34,6 +35,30 @@ const Index = () => {
       setFilters(prev => ({ ...prev, facilities: searchFilters.facilities }));
     }
   };
+
+  // Sample testimonials data
+  const testimonials = [
+    {
+      name: "Sarah Putri",
+      rating: 5,
+      comment: "Sangat mudah mencari kost di KostHub! Prosesnya cepat dan aman. Kost yang saya dapat sesuai dengan yang ada di foto dan deskripsi."
+    },
+    {
+      name: "Ahmad Rizki",
+      rating: 5,
+      comment: "Platform terbaik untuk cari kost! Fitur filternya lengkap dan membantu banget buat nemuin kost yang sesuai budget dan kebutuhan."
+    },
+    {
+      name: "Maya Sari",
+      rating: 4,
+      comment: "Pelayanan customer service nya responsif. Ketika ada masalah dengan booking, langsung dibantu sampai selesai. Recommended!"
+    },
+    {
+      name: "Budi Santoso",
+      rating: 5,
+      comment: "Kualitas kost yang terdaftar di KostHub bagus-bagus. Sudah 2 tahun pakai platform ini dan selalu puas dengan pilihan kostnya."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -79,57 +104,38 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Hero Section with Moving Background */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Moving Background Images */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 to-indigo-100/90 z-10"></div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Background" 
+              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-30"
+            />
+          </div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Background" 
+              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-20"
+            />
+          </div>
+        </div>
+
+        <div className="relative z-20 max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Temukan <span className="text-blue-600">Kost Impian</span> Anda
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Platform terpercaya untuk mencari kost nyaman, aman, dan terjangkau di seluruh Indonesia
           </p>
-          
-          {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Cari kost berdasarkan nama atau lokasi..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-              <Button className="bg-blue-600 hover:bg-blue-700 px-8 py-3">
-                <Search className="w-5 h-5 mr-2" />
-                Cari Kost
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <div className="text-3xl font-bold text-blue-600 mb-2">1000+</div>
-              <div className="text-gray-600">Kost Tersedia</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <div className="text-3xl font-bold text-green-600 mb-2">50+</div>
-              <div className="text-gray-600">Kota Terjangkau</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <div className="text-3xl font-bold text-purple-600 mb-2">10k+</div>
-              <div className="text-gray-600">Penyewa Puas</div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Filters */}
+      {/* Search Filters Section */}
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <SearchFilters 
@@ -152,6 +158,32 @@ const Index = () => {
           </div>
           
           <KostList searchTerm={searchTerm} filters={filters} />
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Apa Kata Pengguna Kami?
+            </h3>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Pengalaman nyata dari para pengguna yang telah menemukan kost impian mereka
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <TestimonialCard
+                key={index}
+                name={testimonial.name}
+                rating={testimonial.rating}
+                comment={testimonial.comment}
+                index={index}
+              />
+            ))}
+          </div>
         </div>
       </section>
 

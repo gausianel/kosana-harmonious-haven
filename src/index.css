@@ -129,6 +129,18 @@ All colors MUST be HSL.
     }
   }
 
+  @keyframes pan {
+    0% {
+      transform: scale(1.1) translateX(-2%);
+    }
+    50% {
+      transform: scale(1.2) translateX(2%);
+    }
+    100% {
+      transform: scale(1.1) translateX(-2%);
+    }
+  }
+
   .animate-fade-in {
     animation: fade-in 0.8s ease-out forwards;
   }
