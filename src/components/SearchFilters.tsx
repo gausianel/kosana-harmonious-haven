@@ -11,9 +11,16 @@ import { Search, MapPin, Filter, X } from "lucide-react";
 
 interface SearchFiltersProps {
   onSearch: (filters: any) => void;
+  filters?: {
+    city: string;
+    minPrice: string;
+    maxPrice: string;
+    facilities: string[];
+  };
+  onFiltersChange?: (filters: any) => void;
 }
 
-const SearchFilters = ({ onSearch }: SearchFiltersProps) => {
+const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
   const [priceRange, setPriceRange] = useState([500000, 3000000]);

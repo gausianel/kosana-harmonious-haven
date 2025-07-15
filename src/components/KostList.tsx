@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,14 +22,24 @@ interface Kost {
   }>;
 }
 
-const KostList = () => {
+interface KostListProps {
+  searchTerm?: string;
+  filters?: {
+    city: string;
+    minPrice: string;
+    maxPrice: string;
+    facilities: string[];
+  };
+}
+
+const KostList = ({ searchTerm, filters }: KostListProps) => {
   const [kosts, setKosts] = useState<Kost[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchKosts();
-  }, []);
+  }, [searchTerm, filters]);
 
   const fetchKosts = async () => {
     try {
