@@ -106,20 +106,33 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
           description: `Booking berhasil dibuat dengan DP sebesar Rp ${dpAmount?.toLocaleString('id-ID')}. Silakan lanjutkan ke pembayaran.`,
         });
       } else {
-        // Create direct payment
-        const { error } = await supabase
-          .from('payments')
-          .insert([{
-            user_id: user.id,
-            room_id: room.id,
-            kost_id: kost.id,
-            amount: totalAmount,
-            payment_type: 'direct',
-            payment_notes: formData.booking_notes,
-            status: 'pending'
-          }]);
+        // Create direct payment - using raw SQL query since types aren't updated yet
+        const { error } = await supabase.rpc('create_direct_payment', {
+          p_user_id: user.id,
+          p_room_id: room.id,
+          p_kost_id: kost.id,
+          p_amount: totalAmount,
+          p_payment_notes: formData.booking_notes
+        });
 
-        if (error) throw error;
+        // If the RPC doesn't exist, fall back to raw insert
+        if (error && error.message.includes('function')) {
+          const { error: insertError } = await supabase
+            .from('payments' as any)
+            .insert([{
+              user_id: user.id,
+              room_id: room.id,
+              kost_id: kost.id,
+              amount: totalAmount,
+              payment_type: 'direct',
+              payment_notes: formData.booking_notes,
+              status: 'pending'
+            }]);
+
+          if (insertError) throw insertError;
+        } else if (error) {
+          throw error;
+        }
 
         toast({
           title: "Pembayaran Berhasil Dibuat!",

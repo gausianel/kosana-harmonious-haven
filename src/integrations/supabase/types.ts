@@ -16,33 +16,58 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          booking_notes: string | null
           created_at: string
+          dp_amount: number | null
+          dp_percentage: number | null
           end_date: string | null
           id: number
+          kost_id: string | null
+          payment_type: string | null
           room_id: number | null
           start_date: string | null
           status_payment: string | null
+          total_amount: number | null
           user_id: string | null
         }
         Insert: {
+          booking_notes?: string | null
           created_at?: string
+          dp_amount?: number | null
+          dp_percentage?: number | null
           end_date?: string | null
           id?: number
+          kost_id?: string | null
+          payment_type?: string | null
           room_id?: number | null
           start_date?: string | null
           status_payment?: string | null
+          total_amount?: number | null
           user_id?: string | null
         }
         Update: {
+          booking_notes?: string | null
           created_at?: string
+          dp_amount?: number | null
+          dp_percentage?: number | null
           end_date?: string | null
           id?: number
+          kost_id?: string | null
+          payment_type?: string | null
           room_id?: number | null
           start_date?: string | null
           status_payment?: string | null
+          total_amount?: number | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_kost_id_fkey"
+            columns: ["kost_id"]
+            isOneToOne: false
+            referencedRelation: "kosts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_room_id_fkey"
             columns: ["room_id"]
@@ -103,6 +128,66 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          kost_id: string | null
+          payment_method: string | null
+          payment_notes: string | null
+          payment_type: string | null
+          room_id: number | null
+          status: string | null
+          transaction_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          kost_id?: string | null
+          payment_method?: string | null
+          payment_notes?: string | null
+          payment_type?: string | null
+          room_id?: number | null
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          kost_id?: string | null
+          payment_method?: string | null
+          payment_notes?: string | null
+          payment_type?: string | null
+          room_id?: number | null
+          status?: string | null
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_kost_id_fkey"
+            columns: ["kost_id"]
+            isOneToOne: false
+            referencedRelation: "kosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
