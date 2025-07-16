@@ -102,8 +102,8 @@ const KostDetail = () => {
     return null;
   };
 
-  const calculateAverageRating = () => {
-    if (reviews.length === 0) return 0;
+  const calculateAverageRating = (): string => {
+    if (reviews.length === 0) return "0";
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
@@ -362,7 +362,6 @@ const KostDetail = () => {
                       <ReviewCard 
                         key={review.id} 
                         review={review}
-                        showUserName={true}
                       />
                     ))}
                   </div>
