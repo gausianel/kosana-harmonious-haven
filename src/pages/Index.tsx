@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,25 +72,18 @@ const Index = () => {
             
             <div className="flex items-center gap-4">
               {user ? (
-                <div className="flex items-center gap-3">
-                  <Link to="/dashboard">
-                    <Button variant="outline" size="sm">
-                      Dashboard
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                        <Users className="w-4 h-4 text-blue-600" />
+                      </div>
                     </Button>
-                  </Link>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-                          <Users className="w-4 h-4 text-blue-600" />
-                        </div>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80" align="end">
-                      <UserProfile />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80" align="end">
+                    <UserProfile />
+                  </PopoverContent>
+                </Popover>
               ) : (
                 <Link to="/auth">
                   <Button>
