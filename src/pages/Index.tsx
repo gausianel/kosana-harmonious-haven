@@ -223,53 +223,9 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center mb-4">
-                <Building2 className="h-8 w-8 text-blue-400 mr-3" />
-                <h3 className="text-xl font-bold">KostHub</h3>
-              </div>
-              <p className="text-gray-400">
-                Platform terpercaya untuk mencari kost impian Anda
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Layanan</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>Cari Kost</li>
-                <li>Daftar Kost</li>
-                <li>Verifikasi</li>
-                <li>Bantuan</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Perusahaan</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>Tentang Kami</li>
-                <li>Karir</li>
-                <li>Blog</li>
-                <li>Kontak</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Dukungan</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>FAQ</li>
-                <li>Syarat & Ketentuan</li>
-                <li>Kebijakan Privasi</li>
-                <li>Bantuan</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 KostHub. Semua hak dilindungi.</p>
-          </div>
+      <footer className="bg-white py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-gray-600">&copy; 2024 KostHub. Semua hak dilindungi.</p>
         </div>
       </footer>
     </div>
