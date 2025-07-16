@@ -86,7 +86,7 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
             <Button 
               onClick={handleSearch}
               size="lg" 
-              className="h-12 px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 hover:scale-105"
+              className="h-12 px-8 bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:scale-105"
             >
               <Search className="w-5 h-5 mr-2" />
               Cari Kost

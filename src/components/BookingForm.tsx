@@ -9,6 +9,7 @@ import { Calendar, CreditCard, User, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import PaymentOption from './PaymentOption';
 import PaymentSummary from './PaymentSummary';
 
@@ -22,6 +23,7 @@ interface BookingFormProps {
 const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'dates' | 'payment' | 'confirm'>('dates');
   const [formData, setFormData] = useState({
@@ -83,7 +85,7 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
       
       if (formData.payment_type === 'booking') {
         // Create booking with DP
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('bookings')
           .insert([{
             user_id: user.id,
@@ -97,7 +99,9 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
             payment_type: 'booking',
             booking_notes: formData.booking_notes,
             status_payment: 'pending'
-          }]);
+          }])
+          .select()
+          .single();
 
         if (error) throw error;
 
@@ -105,9 +109,12 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
           title: "Booking Berhasil!",
           description: `Booking berhasil dibuat dengan DP sebesar Rp ${dpAmount?.toLocaleString('id-ID')}. Silakan lanjutkan ke pembayaran.`,
         });
+
+        // Navigate to payment page
+        navigate(`/payment/${data.id}`);
       } else {
-        // Create direct payment - direct insert to payments table
-        const { error: insertError } = await supabase
+        // Create direct payment
+        const { data, error: insertError } = await supabase
           .from('payments')
           .insert([{
             user_id: user.id,
@@ -117,7 +124,9 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
             payment_type: 'direct',
             payment_notes: formData.booking_notes,
             status: 'pending'
-          }]);
+          }])
+          .select()
+          .single();
 
         if (insertError) throw insertError;
 
@@ -125,6 +134,9 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
           title: "Pembayaran Berhasil Dibuat!",
           description: `Pembayaran langsung sebesar Rp ${totalAmount.toLocaleString('id-ID')} berhasil dibuat. Silakan lanjutkan ke pembayaran.`,
         });
+
+        // Navigate to payment page
+        navigate(`/payment/${data.id}`);
       }
 
       if (onSuccess) onSuccess();
@@ -338,10 +350,7 @@ const BookingForm = ({ room, kost, onSuccess, onCancel }: BookingFormProps) => {
                     ) : (
                       <>
                         <CreditCard className="w-4 h-4 mr-2" />
-                        {formData.payment_type === 'booking' 
-                          ? `Bayar DP Rp ${dpAmount.toLocaleString('id-ID')}`
-                          : `Bayar Rp ${totalAmount.toLocaleString('id-ID')}`
-                        }
+                        Bayar Sekarang
                       </>
                     )}
                   </Button>

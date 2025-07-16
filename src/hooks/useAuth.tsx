@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .insert({
           id: userId,
           full_name: userData.full_name || '',
-          role: userData.role || 'user'
+          role: userData.role || 'user' // Pastikan default role adalah 'user', bukan 'owner'
         })
         .select()
         .single();
@@ -142,6 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string, role: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
+    // Pastikan role yang dikirim benar-benar sesuai dengan yang dipilih user
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -149,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
-          role: role
+          role: role // Ini harus sesuai dengan pilihan user (user atau owner)
         }
       }
     });
