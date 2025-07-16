@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CreditCard, ArrowRight } from "lucide-react";
+import { CreditCard, ArrowRight, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,19 +24,52 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<'info' | 'payment' | 'confirm'>('info');
+  const [step, setStep] = useState<'dates' | 'info' | 'payment' | 'confirm'>('dates');
   const [formData, setFormData] = useState({
+    start_date: '',
+    end_date: '',
     payment_notes: '',
     payment_type: 'direct' as 'direct'
   });
 
-  const amount = room.price || 0;
+  const basePrice = room.price || 0;
+
+  const calculateTotalAmount = () => {
+    if (!formData.start_date || !formData.end_date || !basePrice) return 0;
+    
+    const start = new Date(formData.start_date);
+    const end = new Date(formData.end_date);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+    
+    return diffMonths * basePrice;
+  };
+
+  const calculateMonthsDuration = () => {
+    if (!formData.start_date || !formData.end_date) return 0;
+    
+    const start = new Date(formData.start_date);
+    const end = new Date(formData.end_date);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+  };
+
+  const amount = calculateTotalAmount();
 
   const handleSubmit = async () => {
     if (!user) {
       toast({
         title: "Error",
         description: "Anda harus login terlebih dahulu",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.start_date || !formData.end_date) {
+      toast({
+        title: "Error",
+        description: "Tanggal mulai dan selesai harus diisi",
         variant: "destructive"
       });
       return;
@@ -89,7 +122,7 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
     }
   };
 
-  if (step === 'info') {
+  if (step === 'dates') {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
@@ -104,13 +137,83 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Pilih Tanggal Sewa
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="start_date">Tanggal Mulai</Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={formData.start_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="end_date">Tanggal Selesai</Label>
+              <Input
+                id="end_date"
+                type="date"
+                value={formData.end_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, end_date: e.target.value }))}
+                min={formData.start_date || new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
+            {formData.start_date && formData.end_date && (
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 className="font-semibold text-green-800 mb-2">Ringkasan Biaya</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Durasi:</span>
+                    <span className="font-medium">{calculateMonthsDuration()} bulan</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Harga per bulan:</span>
+                    <span className="font-medium">Rp {basePrice.toLocaleString('id-ID')}</span>
+                  </div>
+                  <hr className="my-2" />
+                  <div className="flex justify-between text-lg font-bold text-green-600">
+                    <span>Total Bayar:</span>
+                    <span>Rp {amount.toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={() => setStep('info')}
+              className="w-full bg-green-600 hover:bg-green-700"
+              disabled={!formData.start_date || !formData.end_date || amount <= 0}
+            >
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Lanjut ke Detail
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (step === 'info') {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
               <CreditCard className="w-5 h-5" />
-              Pembayaran Langsung
+              Detail Pembayaran
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-green-800 mb-2">Detail Pembayaran</h3>
+              <h3 className="font-semibold text-green-800 mb-2">Ringkasan Pesanan</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Kost:</span>
@@ -121,8 +224,20 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
                   <span className="font-medium">{room.room_number}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Harga:</span>
-                  <span className="font-medium">Rp {amount.toLocaleString('id-ID')}/bulan</span>
+                  <span>Tanggal Mulai:</span>
+                  <span className="font-medium">{new Date(formData.start_date).toLocaleDateString('id-ID')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tanggal Selesai:</span>
+                  <span className="font-medium">{new Date(formData.end_date).toLocaleDateString('id-ID')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Durasi:</span>
+                  <span className="font-medium">{calculateMonthsDuration()} bulan</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Harga per bulan:</span>
+                  <span className="font-medium">Rp {basePrice.toLocaleString('id-ID')}</span>
                 </div>
                 <hr className="my-2" />
                 <div className="flex justify-between text-lg font-bold text-green-600">
@@ -143,13 +258,22 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
               />
             </div>
 
-            <Button
-              onClick={() => setStep('payment')}
-              className="w-full bg-green-600 hover:bg-green-700"
-            >
-              <ArrowRight className="w-4 h-4 mr-2" />
-              Lanjut ke Pembayaran
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setStep('dates')}
+                className="flex-1"
+              >
+                Kembali
+              </Button>
+              <Button
+                onClick={() => setStep('payment')}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                <ArrowRight className="w-4 h-4 mr-2" />
+                Lanjut ke Pembayaran
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -170,7 +294,7 @@ const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
             <PaymentOption
               type="direct"
               title="Pembayaran Langsung"
-              description="Bayar penuh langsung untuk kamar ini"
+              description={`Bayar penuh untuk ${calculateMonthsDuration()} bulan sewa`}
               amount={amount}
               isSelected={true}
               onSelect={() => {}}
