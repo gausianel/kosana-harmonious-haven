@@ -44,7 +44,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     }));
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -138,17 +138,15 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
 
           {/* Foto Kamar */}
           <div className="space-y-3">
-            <Label htmlFor="image">Foto Kamar</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <Label>Foto Kamar</Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-              <p className="text-gray-600">Upload foto kamar di bawah</p>
-              <p className="text-sm text-gray-500">PNG, JPG hingga 5MB</p>
-
+              <p className="text-gray-600">PNG, JPG hingga 5MB</p>
               <Button
                 type="button"
                 variant="outline"
-                className="mt-3"
                 onClick={() => fileInputRef.current?.click()}
+                className="mt-3"
               >
                 Pilih Gambar
               </Button>
@@ -185,22 +183,20 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             )}
           </div>
 
-          {/* Nomor & Lantai */}
+          {/* Data lainnya */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="room_number">Nomor Kamar *</Label>
+              <Label>Nomor Kamar *</Label>
               <Input
-                id="room_number"
                 value={formData.room_number}
                 onChange={(e) => handleInputChange('room_number', e.target.value)}
                 placeholder="Contoh: A1, B2, 101"
                 required
-                className="transition-all duration-300 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="floor">Lantai</Label>
+              <Label>Lantai</Label>
               <Select value={formData.floor.toString()} onValueChange={(value) => handleInputChange('floor', parseInt(value))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih lantai" />
@@ -216,24 +212,20 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             </div>
           </div>
 
-          {/* Harga & Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Harga Sewa per Bulan (Rp) *</Label>
+              <Label>Harga Sewa (Rp) *</Label>
               <Input
-                id="price"
                 type="number"
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', e.target.value)}
                 placeholder="Contoh: 1500000"
                 required
-                min="0"
-                className="transition-all duration-300 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Status Kamar</Label>
+              <Label>Status Kamar</Label>
               <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih status" />
@@ -247,7 +239,6 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             </div>
           </div>
 
-          {/* Fasilitas */}
           <div className="space-y-2">
             <Label>Fasilitas Kamar</Label>
             <FacilityChecklist
@@ -256,29 +247,11 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             />
           </div>
 
-          {/* Tombol Aksi */}
           <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 transition-all duration-300"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  {room ? 'Menyimpan...' : 'Menambah...'}
-                </div>
-              ) : (
-                room ? 'Simpan Perubahan' : 'Tambah Kamar'
-              )}
+            <Button type="submit" disabled={loading} className="flex-1">
+              {loading ? 'Menyimpan...' : room ? 'Simpan Perubahan' : 'Tambah Kamar'}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              className="flex-1 transition-all duration-300"
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
               Batal
             </Button>
           </div>
