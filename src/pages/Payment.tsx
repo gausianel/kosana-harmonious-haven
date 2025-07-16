@@ -30,6 +30,16 @@ const Payment = () => {
     if (!id) return;
 
     try {
+      const numericId = parseInt(id, 10);
+      if (isNaN(numericId)) {
+        toast({
+          title: "Error",
+          description: "ID pembayaran tidak valid",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Try to fetch booking first
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
@@ -38,7 +48,7 @@ const Payment = () => {
           kosts:kost_id (name, address),
           rooms:room_id (room_number, price)
         `)
-        .eq('id', id)
+        .eq('id', numericId)
         .single();
 
       if (bookingData && !bookingError) {
@@ -55,7 +65,7 @@ const Payment = () => {
           kosts:kost_id (name, address),
           rooms:room_id (room_number, price)
         `)
-        .eq('id', id)
+        .eq('id', id) // payments table uses UUID, so keep as string
         .single();
 
       if (paymentData && !paymentError) {
