@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,54 +133,6 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-3">
-            <Label htmlFor="image">Foto Kamar</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors space-y-3">
-              <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-              <div>
-                <p className="text-gray-600">Klik tombol di bawah untuk upload foto kamar</p>
-                <p className="text-sm text-gray-500">PNG, JPG hingga 5MB</p>
-              </div>
-              <Button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="mt-2"
-              >
-                Pilih Gambar
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </div>
-
-            {imagePreview && (
-              <div className="relative group">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={removeImage}
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-                <Badge className="absolute bottom-2 left-2 bg-green-500 text-xs">
-                  <Check className="w-2 h-2 mr-1" />
-                  Siap
-                </Badge>
-              </div>
-            )}
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="room_number">Nomor Kamar *</Label>
@@ -246,10 +199,59 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             />
           </div>
 
+          <div className="space-y-3">
+            <Label htmlFor="image">Foto Kamar (Opsional)</Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors space-y-3">
+              <Upload className="w-12 h-12 text-gray-400 mx-auto" />
+              <div>
+                <p className="text-gray-600">Klik tombol di bawah untuk upload foto kamar</p>
+                <p className="text-sm text-gray-500">PNG, JPG hingga 5MB (Opsional)</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-2"
+              >
+                Pilih Gambar
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+
+            {imagePreview && (
+              <div className="relative group">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={removeImage}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+                <Badge className="absolute bottom-2 left-2 bg-green-500 text-xs">
+                  <Check className="w-2 h-2 mr-1" />
+                  Siap
+                </Badge>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
               disabled={loading}
             >
               {loading ? (
@@ -265,7 +267,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
               type="button"
               variant="outline"
               onClick={onCancel}
-              className="flex-1"
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
               disabled={loading}
             >
               Batal

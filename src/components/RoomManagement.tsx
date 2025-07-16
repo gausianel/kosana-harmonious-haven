@@ -46,18 +46,6 @@ const RoomManagement = () => {
     { value: 'maintenance', label: 'Perbaikan', color: 'bg-gray-100 text-gray-800' }
   ];
 
-  useEffect(() => {
-    if (user) {
-      fetchKosts();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedKost) {
-      fetchRooms();
-    }
-  }, [selectedKost]);
-
   const fetchKosts = async () => {
     try {
       const { data, error } = await supabase
@@ -111,6 +99,18 @@ const RoomManagement = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchKosts();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedKost) {
+      fetchRooms();
+    }
+  }, [selectedKost]);
 
   const handleRoomSubmit = async (roomData: any) => {
     setLoading(true);
@@ -230,7 +230,7 @@ const RoomManagement = () => {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button 
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 setEditingRoom(null);
               }}
@@ -268,7 +268,7 @@ const RoomManagement = () => {
             <select 
               value={selectedKost} 
               onChange={(e) => setSelectedKost(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               {kosts.map((kost) => (
                 <option key={kost.id} value={kost.id}>
@@ -298,10 +298,13 @@ const RoomManagement = () => {
             ) : rooms.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-600 mb-4">Belum ada kamar yang ditambahkan</p>
-                <Button onClick={() => {
-                  setEditingRoom(null);
-                  setIsDialogOpen(true);
-                }}>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => {
+                    setEditingRoom(null);
+                    setIsDialogOpen(true);
+                  }}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Tambah Kamar Pertama
                 </Button>
@@ -329,7 +332,7 @@ const RoomManagement = () => {
                         <select 
                           value={room.status} 
                           onChange={(e) => handleStatusChange(room.id, e.target.value)}
-                          className="border border-gray-300 rounded px-2 py-1 text-sm"
+                          className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                           {statusOptions.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -353,6 +356,7 @@ const RoomManagement = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => openEditDialog(room)}
+                            className="hover:bg-blue-50 hover:border-blue-300"
                           >
                             <Edit className="w-3 h-3" />
                           </Button>
@@ -360,7 +364,7 @@ const RoomManagement = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleDelete(room.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-300"
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
