@@ -1,17 +1,17 @@
-
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, MapPin, Phone, Mail, Wifi, Car, Shield, Calendar, CreditCard, Home, Users, Star } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import ImageCarousel from '@/components/ImageCarousel';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, MapPin, Phone, Mail, Wifi, Car, Shield, Star, Building2, Users, Calendar } from "lucide-react";
 import BookingForm from '@/components/BookingForm';
+import DirectPaymentButton from '@/components/DirectPaymentButton';
 import StarRating from '@/components/StarRating';
+import ReviewCard from '@/components/ReviewCard';
 
 const KostDetail = () => {
   const { id } = useParams();
@@ -27,13 +27,13 @@ const KostDetail = () => {
 
   useEffect(() => {
     if (id) {
-      fetchKostDetails();
+      fetchKostDetail();
       fetchRooms();
       fetchReviews();
     }
   }, [id]);
 
-  const fetchKostDetails = async () => {
+  const fetchKostDetail = async () => {
     try {
       const { data, error } = await supabase
         .from('kosts')
@@ -44,7 +44,7 @@ const KostDetail = () => {
       if (error) throw error;
       setKost(data);
     } catch (error) {
-      console.error('Error fetching kost details:', error);
+      console.error('Error fetching kost detail:', error);
       toast({
         title: "Error",
         description: "Gagal memuat detail kost",
@@ -61,7 +61,6 @@ const KostDetail = () => {
         .from('rooms')
         .select('*')
         .eq('kost_id', id)
-        .eq('status', 'available')
         .order('room_number');
 
       if (error) throw error;
@@ -77,13 +76,10 @@ const KostDetail = () => {
         .from('reviews')
         .select(`
           *,
-          profiles (
-            full_name
-          )
+          profiles:user_id (full_name)
         `)
         .eq('kost_id', id)
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setReviews(data || []);
@@ -103,21 +99,13 @@ const KostDetail = () => {
     if (facilityLower.includes('keamanan') || facilityLower.includes('security') || facilityLower.includes('cctv')) {
       return <Shield className="w-4 h-4" />;
     }
-    return <Home className="w-4 h-4" />;
+    return null;
   };
 
-  const handleBookRoom = (room: any) => {
-    if (!user) {
-      toast({
-        title: "Login Diperlukan",
-        description: "Silakan login terlebih dahulu untuk melakukan booking",
-        variant: "destructive"
-      });
-      navigate('/auth');
-      return;
-    }
-    setSelectedRoom(room);
-    setShowBookingForm(true);
+  const calculateAverageRating = () => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
   };
 
   const handleBookingSuccess = () => {
@@ -125,87 +113,93 @@ const KostDetail = () => {
     setSelectedRoom(null);
     toast({
       title: "Booking Berhasil!",
-      description: "Booking Anda telah berhasil dibuat. Silakan lanjutkan pembayaran.",
+      description: "Booking Anda telah berhasil dibuat.",
     });
-  };
-
-  // Simulasi rating untuk setiap kamar (dalam implementasi nyata, ini akan diambil dari database)
-  const getRoomRating = (roomId: number) => {
-    // Simulasi rating antara 3.5 - 5.0
-    const ratings = [4.2, 4.7, 3.8, 4.5, 4.1, 4.9, 3.9, 4.3, 4.6, 4.0];
-    return ratings[roomId % ratings.length] || 4.0;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   if (!kost) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Kost tidak ditemukan</h1>
-          <Button onClick={() => navigate('/')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Beranda
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Kost Tidak Ditemukan</CardTitle>
+            <CardDescription>Kost yang Anda cari tidak tersedia.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/')} className="w-full">
+              Kembali ke Beranda
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  const averageRating = reviews.length > 0 
-    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
-    : 0;
+  const averageRating = calculateAverageRating();
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Kembali ke Beranda
-          </Button>
+      <div className="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali
+            </Button>
+            
+            <div className="flex items-center gap-4">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Halo, {user.email}</span>
+                  <Link to="/profile">
+                    <Button variant="outline" size="sm">Profile</Button>
+                  </Link>
+                </div>
+              ) : (
+                <Link to="/auth">
+                  <Button>Login</Button>
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Kost Images */}
-            {kost.images && kost.images.length > 0 && (
-              <Card>
-                <CardContent className="p-0">
-                  <ImageCarousel images={kost.images} />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Kost Information */}
+            {/* Kost Info */}
             <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-2xl text-gray-800">{kost.name}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-2">
+                    <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                      <Building2 className="w-6 h-6 text-blue-600" />
+                      {kost.name}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-1 mt-2 text-base">
                       <MapPin className="w-4 h-4" />
                       {kost.address}, {kost.city}
                     </CardDescription>
                   </div>
                   {reviews.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{averageRating.toFixed(1)}</span>
+                    <div className="flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                      <span className="font-semibold">{averageRating}</span>
                       <span className="text-gray-500">({reviews.length} ulasan)</span>
                     </div>
                   )}
@@ -219,7 +213,6 @@ const KostDetail = () => {
                   </div>
                 )}
 
-                {/* Contact Information */}
                 {(kost.contact_phone || kost.contact_email) && (
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-2">Kontak</h3>
@@ -240,10 +233,9 @@ const KostDetail = () => {
                   </div>
                 )}
 
-                {/* Facilities */}
                 {kost.facilities && kost.facilities.length > 0 && (
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Fasilitas Umum</h3>
+                    <h3 className="font-semibold text-gray-800 mb-2">Fasilitas</h3>
                     <div className="flex flex-wrap gap-2">
                       {kost.facilities.map((facility: string, index: number) => (
                         <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -257,7 +249,7 @@ const KostDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Available Rooms */}
+            {/* Rooms */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -265,74 +257,113 @@ const KostDetail = () => {
                   Kamar Tersedia
                 </CardTitle>
                 <CardDescription>
-                  {rooms.length} kamar tersedia untuk disewa
+                  Pilih kamar yang sesuai dengan kebutuhan Anda
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {rooms.length === 0 ? (
                   <div className="text-center py-8">
                     <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Tidak ada kamar yang tersedia saat ini</p>
+                    <p className="text-gray-600">Belum ada kamar tersedia</p>
                   </div>
                 ) : (
                   <div className="grid gap-4">
                     {rooms.map((room) => (
                       <div key={room.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <div className="flex items-center gap-3 mb-1">
-                              <h4 className="font-semibold text-lg">Kamar {room.room_number}</h4>
-                              <StarRating 
-                                rating={getRoomRating(room.id)} 
-                                size="sm"
-                                className="bg-white px-2 py-1 rounded-full shadow-sm border"
-                              />
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-4 mb-2">
+                              <h3 className="font-semibold text-lg">Kamar {room.room_number}</h3>
+                              <Badge variant={room.status === 'available' ? 'default' : 'secondary'}>
+                                {room.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
+                              </Badge>
                             </div>
-                            <p className="text-gray-600">Lantai {room.floor}</p>
+                            <div className="text-sm text-gray-600 space-y-1">
+                              <p>Lantai: {room.floor}</p>
+                              {room.facilities && <p>Fasilitas: {room.facilities}</p>}
+                              <p className="text-lg font-bold text-blue-600">
+                                Rp {room.price?.toLocaleString('id-ID')}/bulan
+                              </p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-blue-600">
-                              Rp {room.price?.toLocaleString('id-ID')}
-                            </p>
-                            <p className="text-sm text-gray-500">per bulan</p>
+                          <div className="flex flex-col gap-2">
+                            {user && room.status === 'available' ? (
+                              <>
+                                <Dialog open={showBookingForm && selectedRoom?.id === room.id} onOpenChange={(open) => {
+                                  setShowBookingForm(open);
+                                  if (!open) setSelectedRoom(null);
+                                }}>
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      onClick={() => setSelectedRoom(room)}
+                                      className="bg-blue-600 hover:bg-blue-700"
+                                    >
+                                      <Calendar className="w-4 h-4 mr-2" />
+                                      Booking
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                                    <DialogHeader>
+                                      <DialogTitle>Booking Kamar {room.room_number}</DialogTitle>
+                                    </DialogHeader>
+                                    <BookingForm 
+                                      room={room} 
+                                      kost={kost} 
+                                      onSuccess={handleBookingSuccess}
+                                      onCancel={() => {
+                                        setShowBookingForm(false);
+                                        setSelectedRoom(null);
+                                      }}
+                                    />
+                                  </DialogContent>
+                                </Dialog>
+                                <DirectPaymentButton room={room} kost={kost} />
+                              </>
+                            ) : !user ? (
+                              <Link to="/auth">
+                                <Button variant="outline">Login untuk Booking</Button>
+                              </Link>
+                            ) : (
+                              <Button disabled>Tidak Tersedia</Button>
+                            )}
                           </div>
-                        </div>
-
-                        {/* Room Images */}
-                        {room.image && (
-                          <div className="mb-3">
-                            <img 
-                              src={room.image} 
-                              alt={`Kamar ${room.room_number}`}
-                              className="w-full h-48 object-cover rounded-lg"
-                            />
-                          </div>
-                        )}
-
-                        {room.facilities && (
-                          <div className="mb-3">
-                            <p className="text-sm font-medium text-gray-700 mb-1">Fasilitas:</p>
-                            <p className="text-sm text-gray-600">{room.facilities}</p>
-                          </div>
-                        )}
-
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleBookRoom(room)}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700"
-                          >
-                            <Calendar className="w-4 h-4 mr-2" />
-                            Booking Sekarang
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            <CreditCard className="w-4 h-4 mr-2" />
-                            Bayar Langsung
-                          </Button>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Reviews */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5" />
+                  Ulasan ({reviews.length})
+                </CardTitle>
+                {reviews.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={parseFloat(averageRating)} />
+                    <span className="text-lg font-semibold">{averageRating}</span>
+                    <span className="text-gray-500">dari {reviews.length} ulasan</span>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                {reviews.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Star className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Belum ada ulasan</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <ReviewCard 
+                        key={review.id} 
+                        review={review}
+                        showUserName={true}
+                      />
                     ))}
                   </div>
                 )}
@@ -342,71 +373,46 @@ const KostDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Quick Info Card */}
-            <Card>
+            <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle>Informasi Singkat</CardTitle>
+                <CardTitle>Informasi Kost</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Total Kamar</span>
-                  <span className="font-semibold">{rooms.length}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Kamar Tersedia</span>
-                  <span className="font-semibold text-green-600">{rooms.length}</span>
-                </div>
-                {averageRating > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Rating</span>
-                    <StarRating rating={averageRating} size="sm" />
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 mb-2">
+                    {rooms.length > 0 ? (
+                      `Rp ${Math.min(...rooms.map(r => r.price || 0)).toLocaleString('id-ID')} - ${Math.max(...rooms.map(r => r.price || 0)).toLocaleString('id-ID')}`
+                    ) : (
+                      'Harga belum tersedia'
+                    )}
                   </div>
-                )}
+                  <p className="text-gray-600">per bulan</p>
+                </div>
+                
+                <div className="space-y-2 pt-4 border-t">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Kamar:</span>
+                    <span className="font-semibold">{rooms.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tersedia:</span>
+                    <span className="font-semibold text-green-600">
+                      {rooms.filter(r => r.status === 'available').length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Rating:</span>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="font-semibold">{averageRating || 'Belum ada'}</span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-
-            {/* Recent Reviews */}
-            {reviews.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ulasan Terbaru</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {reviews.slice(0, 3).map((review) => (
-                    <div key={review.id} className="border-b pb-3 last:border-b-0">
-                      <StarRating rating={review.rating} size="sm" showNumber={false} className="mb-1" />
-                      <p className="text-sm text-gray-600 mb-1">{review.comment}</p>
-                      <p className="text-xs text-gray-500">
-                        {review.profiles?.full_name || 'Anonymous'}
-                      </p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
-
-      {/* Booking Dialog */}
-      <Dialog open={showBookingForm} onOpenChange={setShowBookingForm}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Booking Kamar {selectedRoom?.room_number}</DialogTitle>
-            <DialogDescription>
-              Isi form berikut untuk melakukan booking kamar
-            </DialogDescription>
-          </DialogHeader>
-          {selectedRoom && (
-            <BookingForm
-              room={selectedRoom}
-              kost={kost}
-              onSuccess={handleBookingSuccess}
-              onCancel={() => setShowBookingForm(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -4,26 +4,63 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, Calendar, DollarSign } from "lucide-react";
+import { Building2, Users, Calendar, DollarSign, AlertTriangle } from "lucide-react";
 import KostManagement from "@/components/KostManagement";
 import RoomManagement from "@/components/RoomManagement";
 import OwnerProfilePopup from "@/components/OwnerProfilePopup";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("kosts");
 
   useEffect(() => {
     if (!user) {
       navigate("/auth");
+      return;
     }
-  }, [user, navigate]);
+
+    // Check if user has owner role
+    if (profile && profile.role !== 'owner') {
+      // Show error and redirect non-owner users
+      console.log('User role:', profile.role, 'Access denied to dashboard');
+    }
+  }, [user, profile, navigate]);
 
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show access denied for non-owner users
+  if (profile && profile.role !== 'owner') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-600" />
+            </div>
+            <CardTitle className="text-xl text-gray-800">
+              Akses Ditolak
+            </CardTitle>
+            <CardDescription>
+              Anda tidak memiliki akses ke dashboard owner. Halaman ini hanya untuk pemilik kost.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button 
+              onClick={() => navigate('/')}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Kembali ke Beranda
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }

@@ -1,0 +1,216 @@
+
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { CreditCard, ArrowRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import PaymentOption from './PaymentOption';
+
+interface DirectPaymentButtonProps {
+  room: any;
+  kost: any;
+}
+
+const DirectPaymentButton = ({ room, kost }: DirectPaymentButtonProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<'info' | 'payment' | 'confirm'>('info');
+  const [formData, setFormData] = useState({
+    payment_notes: '',
+    payment_type: 'direct' as 'direct'
+  });
+
+  const amount = room.price || 0;
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Anda harus login terlebih dahulu",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (amount <= 0) {
+      toast({
+        title: "Error",
+        description: "Harga kamar tidak valid",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .insert([{
+          user_id: user.id,
+          room_id: room.id,
+          kost_id: kost.id,
+          amount: amount,
+          payment_type: 'direct',
+          payment_notes: formData.payment_notes,
+          status: 'pending'
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Pembayaran Berhasil Dibuat!",
+        description: `Pembayaran langsung sebesar Rp ${amount.toLocaleString('id-ID')} berhasil dibuat.`,
+      });
+
+      // Navigate to payment page
+      navigate(`/payment/${data.id}`);
+      setOpen(false);
+    } catch (error) {
+      console.error('Error creating direct payment:', error);
+      toast({
+        title: "Error",
+        description: "Gagal membuat pembayaran",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (step === 'info') {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3"
+            size="lg"
+          >
+            <CreditCard className="w-5 h-5 mr-2" />
+            Bayar Sekarang
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Pembayaran Langsung
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <h3 className="font-semibold text-green-800 mb-2">Detail Pembayaran</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Kost:</span>
+                  <span className="font-medium">{kost.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Kamar:</span>
+                  <span className="font-medium">{room.room_number}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Harga:</span>
+                  <span className="font-medium">Rp {amount.toLocaleString('id-ID')}/bulan</span>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between text-lg font-bold text-green-600">
+                  <span>Total Bayar:</span>
+                  <span>Rp {amount.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="payment_notes">Catatan Pembayaran (Opsional)</Label>
+              <Textarea
+                id="payment_notes"
+                value={formData.payment_notes}
+                onChange={(e) => setFormData(prev => ({ ...prev, payment_notes: e.target.value }))}
+                placeholder="Tambahkan catatan untuk pembayaran Anda..."
+                rows={3}
+              />
+            </div>
+
+            <Button
+              onClick={() => setStep('payment')}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Lanjut ke Pembayaran
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (step === 'payment') {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Konfirmasi Metode Pembayaran
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <PaymentOption
+              type="direct"
+              title="Pembayaran Langsung"
+              description="Bayar penuh langsung untuk kamar ini"
+              amount={amount}
+              isSelected={true}
+              onSelect={() => {}}
+              disabled={true}
+            />
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setStep('info')}
+                className="flex-1"
+                disabled={loading}
+              >
+                Kembali
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Memproses...
+                  </div>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Bayar Sekarang
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return null;
+};
+
+export default DirectPaymentButton;
