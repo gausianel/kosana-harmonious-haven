@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,11 +23,12 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
     price: room?.price || '',
     status: room?.status || 'available',
     facilities: room?.facilities ? room.facilities.split(',').map((f: string) => f.trim()).filter((f: string) => f) : [],
-    image: room?.image || '' // Changed from images array to single image string
+    image: room?.image || ''
   });
-  const [imagePreview, setImagePreview] = useState<string>(room?.image || ''); // Changed from array to single string
-  
+  const [imagePreview, setImagePreview] = useState<string>(room?.image || '');
+
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
@@ -45,10 +46,8 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Error",
@@ -58,7 +57,6 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Error",
@@ -68,7 +66,6 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       return;
     }
 
-    // Create preview URL
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
@@ -92,11 +89,14 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       ...prev,
       image: ''
     }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.room_number.trim()) {
       toast({
         title: "Error",
@@ -115,12 +115,11 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       return;
     }
 
-    // Prepare data for submission
     const roomData = {
       ...formData,
       price: Number(formData.price),
       floor: Number(formData.floor),
-      facilities: formData.facilities.join(', ') // Convert array back to string for database storage
+      facilities: formData.facilities.join(', ')
     };
 
     onSubmit(roomData);
@@ -136,26 +135,32 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Single Image Upload Section */}
+
+          {/* Foto Kamar */}
           <div className="space-y-3">
             <Label htmlFor="image">Foto Kamar</Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-              <div className="space-y-3">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto" />
-                <div>
-                  <p className="text-gray-600">Klik untuk upload foto kamar</p>
-                  <p className="text-sm text-gray-500">PNG, JPG hingga 5MB</p>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-              </div>
+              <Upload className="w-12 h-12 text-gray-400 mx-auto" />
+              <p className="text-gray-600">Upload foto kamar di bawah</p>
+              <p className="text-sm text-gray-500">PNG, JPG hingga 5MB</p>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Pilih Gambar
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
 
-            {/* Image Preview */}
             {imagePreview && (
               <div className="relative group">
                 <img
@@ -180,6 +185,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             )}
           </div>
 
+          {/* Nomor & Lantai */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="room_number">Nomor Kamar *</Label>
@@ -210,6 +216,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             </div>
           </div>
 
+          {/* Harga & Status */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="price">Harga Sewa per Bulan (Rp) *</Label>
@@ -240,6 +247,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             </div>
           </div>
 
+          {/* Fasilitas */}
           <div className="space-y-2">
             <Label>Fasilitas Kamar</Label>
             <FacilityChecklist
@@ -248,6 +256,7 @@ const RoomForm = ({ room, onSubmit, onCancel, loading = false }: RoomFormProps) 
             />
           </div>
 
+          {/* Tombol Aksi */}
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
