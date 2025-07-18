@@ -18,7 +18,7 @@ interface Kost {
     id: number;
     price: number;
     status: string;
-    image?: string;
+    images?: string[];
   }>;
 }
 
@@ -60,14 +60,14 @@ const KostList = ({ searchTerm, filters }: KostListProps) => {
         (kostsData || []).map(async (kost) => {
           const { data: roomsData } = await supabase
             .from('rooms')
-            .select('id, price, status, image')
+            .select('id, price, status, images')
             .eq('kost_id', kost.id)
             .eq('status', 'available');
 
           // Combine kost images with room images, prioritizing room images
           const roomImages = (roomsData || [])
-            .filter(room => room.image)
-            .map(room => room.image);
+            .filter(room => room.images && room.images.length > 0)
+            .flatMap(room => room.images || []);
           
           const kostImages = kost.images || [];
           const allImages = [...roomImages, ...kostImages].filter(Boolean);
