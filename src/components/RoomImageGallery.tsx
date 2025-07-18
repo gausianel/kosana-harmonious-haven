@@ -7,16 +7,25 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 interface RoomImageGalleryProps {
   images: string[];
   roomNumber?: string;
+  roomDescription?: string;
 }
 
-const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
+const RoomImageGallery = ({ images, roomNumber, roomDescription }: RoomImageGalleryProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-        <p className="text-gray-500">Belum ada foto</p>
+      <div className="space-y-4">
+        <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+          <p className="text-gray-500">Belum ada foto</p>
+        </div>
+        {roomDescription && (
+          <div className="text-sm text-gray-600">
+            <p className="font-medium mb-1">Deskripsi Kamar:</p>
+            <p>{roomDescription}</p>
+          </div>
+        )}
       </div>
     );
   }
@@ -34,25 +43,25 @@ const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const mainImage = images[0];
-  const otherImages = images.slice(1, 4); // Show up to 3 additional images
+  const mainImage = images[currentIndex] || images[0];
+  const otherImages = images.slice(1, 4);
 
   return (
     <>
-      <div className="space-y-2">
-        {/* Main Image */}
+      <div className="space-y-4">
+        {/* Main Image - Made larger */}
         <div 
           className="relative cursor-pointer group"
-          onClick={() => openGallery(0)}
+          onClick={() => openGallery(currentIndex)}
         >
           <img
             src={mainImage}
-            alt={`Kamar ${roomNumber || ''} - Foto utama`}
-            className="w-full h-48 object-cover rounded-lg group-hover:opacity-90 transition-opacity"
+            alt={`Kamar ${roomNumber || ''} - Foto ${currentIndex + 1}`}
+            className="w-full h-64 md:h-80 object-cover rounded-lg group-hover:opacity-90 transition-opacity"
           />
           {images.length > 1 && (
             <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-sm">
-              +{images.length - 1} foto
+              {currentIndex + 1}/{images.length}
             </div>
           )}
           
@@ -85,22 +94,27 @@ const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
           )}
         </div>
 
-        {/* Thumbnail Grid */}
-        {otherImages.length > 0 && (
-          <div className="grid grid-cols-3 gap-2">
-            {otherImages.map((image, index) => (
+        {/* Thumbnail Grid - Only show if more than 1 image */}
+        {images.length > 1 && (
+          <div className="grid grid-cols-4 gap-2">
+            {images.slice(0, 4).map((image, index) => (
               <div
                 key={index}
-                className="relative cursor-pointer group"
-                onClick={() => openGallery(index + 1)}
+                className={`relative cursor-pointer group border-2 rounded transition-all ${
+                  index === currentIndex ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
+                }`}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  openGallery(index);
+                }}
               >
                 <img
                   src={image}
-                  alt={`Kamar ${roomNumber || ''} - Foto ${index + 2}`}
+                  alt={`Kamar ${roomNumber || ''} - Foto ${index + 1}`}
                   className="w-full h-16 object-cover rounded group-hover:opacity-90 transition-opacity"
                 />
-                {index === 2 && images.length > 4 && (
-                  <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-white text-sm font-medium">
+                {index === 3 && images.length > 4 && (
+                  <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center text-white text-xs font-medium">
                     +{images.length - 4}
                   </div>
                 )}
@@ -108,14 +122,22 @@ const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
             ))}
           </div>
         )}
+
+        {/* Room Description - Added below images */}
+        {roomDescription && (
+          <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+            <p className="font-medium mb-1">Deskripsi Kamar:</p>
+            <p>{roomDescription}</p>
+          </div>
+        )}
       </div>
 
-      {/* Full Screen Gallery Modal */}
+      {/* Full Screen Gallery Modal - Single X button only */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0">
+        <DialogContent className="max-w-5xl h-[90vh] p-0">
           <div className="relative h-full flex flex-col">
-            {/* Header with single X button */}
-            <div className="flex items-center justify-between p-4 border-b">
+            {/* Header with single X button - no duplicate */}
+            <div className="flex items-center justify-between p-4 border-b bg-white">
               <h3 className="text-lg font-semibold">
                 Foto Kamar {roomNumber} ({currentIndex + 1}/{images.length})
               </h3>
@@ -123,6 +145,7 @@ const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
+                className="hover:bg-gray-100"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -181,7 +204,7 @@ const RoomImageGallery = ({ images, roomNumber }: RoomImageGalleryProps) => {
 
             {/* Thumbnail Strip */}
             {images.length > 1 && (
-              <div className="p-4 border-t">
+              <div className="p-4 border-t bg-white">
                 <div className="flex gap-2 overflow-x-auto">
                   {images.map((image, index) => (
                     <button

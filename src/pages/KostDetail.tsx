@@ -278,6 +278,7 @@ const KostDetail = () => {
                             <RoomImageGallery 
                               images={room.images || []} 
                               roomNumber={room.room_number}
+                              roomDescription={room.facilities}
                             />
                           </div>
                           
@@ -294,7 +295,6 @@ const KostDetail = () => {
                             
                             <div className="text-sm text-gray-600 space-y-1">
                               <p>Lantai: {room.floor}</p>
-                              {room.facilities && <p>Fasilitas: {room.facilities}</p>}
                               <p className="text-lg font-bold text-blue-600">
                                 Rp {room.price?.toLocaleString('id-ID')}/bulan
                               </p>
