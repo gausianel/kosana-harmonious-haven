@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +41,7 @@ const Index = () => {
     {
       name: "Sarah Putri",
       rating: 5,
-      comment: "Sangat mudah mencari kost di KostHub! Prosesnya cepat dan aman. Kost yang saya dapat sesuai dengan yang ada di foto dan deskripsi."
+      comment: "Sangat mudah mencari kost di KOSANA! Prosesnya cepat dan aman. Kost yang saya dapat sesuai dengan yang ada di foto dan deskripsi."
     },
     {
       name: "Ahmad Rizki",
@@ -55,7 +56,7 @@ const Index = () => {
     {
       name: "Budi Santoso",
       rating: 5,
-      comment: "Kualitas kost yang terdaftar di KostHub bagus-bagus. Sudah 2 tahun pakai platform ini dan selalu puas dengan pilihan kostnya."
+      comment: "Kualitas kost yang terdaftar di KOSANA bagus-bagus. Sudah 2 tahun pakai platform ini dan selalu puas dengan pilihan kostnya."
     }
   ];
 
@@ -67,7 +68,7 @@ const Index = () => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Building2 className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">KostHub</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">KOSANA</h1>
             </div>
             
             <div className="flex items-center gap-4">
@@ -187,7 +188,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              Mengapa Memilih KostHub?
+              Mengapa Memilih KOSANA?
             </h3>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Kami menyediakan platform terbaik untuk mencari dan mengelola kost
@@ -225,7 +226,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-600">&copy; 2024 KostHub. Semua hak dilindungi.</p>
+          <p className="text-gray-600">&copy; 2024 KOSANA. Semua hak dilindungi.</p>
         </div>
       </footer>
     </div>
