@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +13,7 @@ import BookingForm from '@/components/BookingForm';
 import DirectPaymentButton from '@/components/DirectPaymentButton';
 import StarRating from '@/components/StarRating';
 import ReviewCard from '@/components/ReviewCard';
+import RoomImageGallery from '@/components/RoomImageGallery';
 
 const KostDetail = () => {
   const { id } = useParams();
@@ -267,17 +269,29 @@ const KostDetail = () => {
                     <p className="text-gray-600">Belum ada kamar tersedia</p>
                   </div>
                 ) : (
-                  <div className="grid gap-4">
+                  <div className="grid gap-6">
                     {rooms.map((room) => (
                       <div key={room.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-4 mb-2">
-                              <h3 className="font-semibold text-lg">Kamar {room.room_number}</h3>
-                              <Badge variant={room.status === 'available' ? 'default' : 'secondary'}>
-                                {room.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
-                              </Badge>
+                        <div className="grid md:grid-cols-3 gap-4">
+                          {/* Room Images */}
+                          <div className="md:col-span-1">
+                            <RoomImageGallery 
+                              images={room.images || []} 
+                              roomNumber={room.room_number}
+                            />
+                          </div>
+                          
+                          {/* Room Info */}
+                          <div className="md:col-span-2 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <h3 className="font-semibold text-lg">Kamar {room.room_number}</h3>
+                                <Badge variant={room.status === 'available' ? 'default' : 'secondary'}>
+                                  {room.status === 'available' ? 'Tersedia' : 'Tidak Tersedia'}
+                                </Badge>
+                              </div>
                             </div>
+                            
                             <div className="text-sm text-gray-600 space-y-1">
                               <p>Lantai: {room.floor}</p>
                               {room.facilities && <p>Fasilitas: {room.facilities}</p>}
@@ -285,47 +299,48 @@ const KostDetail = () => {
                                 Rp {room.price?.toLocaleString('id-ID')}/bulan
                               </p>
                             </div>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            {user && room.status === 'available' ? (
-                              <>
-                                <Dialog open={showBookingForm && selectedRoom?.id === room.id} onOpenChange={(open) => {
-                                  setShowBookingForm(open);
-                                  if (!open) setSelectedRoom(null);
-                                }}>
-                                  <DialogTrigger asChild>
-                                    <Button 
-                                      onClick={() => setSelectedRoom(room)}
-                                      className="bg-blue-600 hover:bg-blue-700"
-                                    >
-                                      <Calendar className="w-4 h-4 mr-2" />
-                                      Booking
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-                                    <DialogHeader>
-                                      <DialogTitle>Booking Kamar {room.room_number}</DialogTitle>
-                                    </DialogHeader>
-                                    <BookingForm 
-                                      room={room} 
-                                      kost={kost} 
-                                      onSuccess={handleBookingSuccess}
-                                      onCancel={() => {
-                                        setShowBookingForm(false);
-                                        setSelectedRoom(null);
-                                      }}
-                                    />
-                                  </DialogContent>
-                                </Dialog>
-                                <DirectPaymentButton room={room} kost={kost} />
-                              </>
-                            ) : !user ? (
-                              <Link to="/auth">
-                                <Button variant="outline">Login untuk Booking</Button>
-                              </Link>
-                            ) : (
-                              <Button disabled>Tidak Tersedia</Button>
-                            )}
+                            
+                            <div className="flex flex-col gap-2">
+                              {user && room.status === 'available' ? (
+                                <>
+                                  <Dialog open={showBookingForm && selectedRoom?.id === room.id} onOpenChange={(open) => {
+                                    setShowBookingForm(open);
+                                    if (!open) setSelectedRoom(null);
+                                  }}>
+                                    <DialogTrigger asChild>
+                                      <Button 
+                                        onClick={() => setSelectedRoom(room)}
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                      >
+                                        <Calendar className="w-4 h-4 mr-2" />
+                                        Booking
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                                      <DialogHeader>
+                                        <DialogTitle>Booking Kamar {room.room_number}</DialogTitle>
+                                      </DialogHeader>
+                                      <BookingForm 
+                                        room={room} 
+                                        kost={kost} 
+                                        onSuccess={handleBookingSuccess}
+                                        onCancel={() => {
+                                          setShowBookingForm(false);
+                                          setSelectedRoom(null);
+                                        }}
+                                      />
+                                    </DialogContent>
+                                  </Dialog>
+                                  <DirectPaymentButton room={room} kost={kost} />
+                                </>
+                              ) : !user ? (
+                                <Link to="/auth">
+                                  <Button variant="outline" className="w-full">Login untuk Booking</Button>
+                                </Link>
+                              ) : (
+                                <Button disabled className="w-full">Tidak Tersedia</Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

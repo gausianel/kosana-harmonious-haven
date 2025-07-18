@@ -267,7 +267,7 @@ export type Database = {
           facilities: string | null
           floor: number | null
           id: number
-          image: string | null
+          images: string[] | null
           kost_id: string | null
           price: number | null
           room_number: string | null
@@ -278,7 +278,7 @@ export type Database = {
           facilities?: string | null
           floor?: number | null
           id?: number
-          image?: string | null
+          images?: string[] | null
           kost_id?: string | null
           price?: number | null
           room_number?: string | null
@@ -289,7 +289,7 @@ export type Database = {
           facilities?: string | null
           floor?: number | null
           id?: number
-          image?: string | null
+          images?: string[] | null
           kost_id?: string | null
           price?: number | null
           room_number?: string | null

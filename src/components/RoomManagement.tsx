@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ interface Room {
   price: number;
   status: string;
   facilities: string;
-  image: string;
+  images: string[];
   kost_id: string;
   created_at: string;
 }
@@ -84,7 +85,7 @@ const RoomManagement = () => {
       // Transform the data to match our Room interface
       const transformedData = (data || []).map(room => ({
         ...room,
-        image: room.image || '', // Ensure image is a string
+        images: room.images || [], // Ensure images is an array
       }));
       
       setRooms(transformedData);
@@ -347,7 +348,7 @@ const RoomManagement = () => {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Image className="w-4 h-4" />
-                          <span className="text-sm">{room.image ? '1' : '0'}</span>
+                          <span className="text-sm">{room.images?.length || 0}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -378,26 +379,6 @@ const RoomManagement = () => {
           </CardContent>
         </Card>
       )}
-
-      {/* Dialog untuk form room */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingRoom ? 'Edit Kamar' : 'Tambah Kamar Baru'}
-            </DialogTitle>
-            <DialogDescription>
-              {editingRoom ? 'Perbarui informasi kamar' : 'Tambahkan kamar baru ke properti kost Anda'}
-            </DialogDescription>
-          </DialogHeader>
-          <RoomForm
-            room={editingRoom}
-            onSubmit={handleRoomSubmit}
-            onCancel={() => setIsDialogOpen(false)}
-            loading={loading}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
