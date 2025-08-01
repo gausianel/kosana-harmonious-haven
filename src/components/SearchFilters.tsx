@@ -84,7 +84,7 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
           <Button 
             onClick={handleSearch}
             size="default" 
-            className="h-12 px-8 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-xl rounded-xl border-0"
+            className="h-12 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-xl rounded-xl border-0"
           >
             <Search className="w-5 h-5 mr-2" />
             Cari Kost
@@ -162,7 +162,7 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
                     variant={facilities.includes(facility) ? "default" : "outline"}
                     className={`cursor-pointer hover:scale-105 transition-transform text-sm py-1 px-3 rounded-full ${
                       facilities.includes(facility) 
-                        ? "bg-yellow-500 text-white border-yellow-500" 
+                        ? "bg-blue-600 text-white border-blue-600" 
                         : "bg-white/20 text-white border-white/30 hover:bg-white/30"
                     }`}
                     onClick={() => toggleFacility(facility)}
