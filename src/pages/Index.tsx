@@ -60,6 +60,34 @@ const Index = () => {
     }
   ];
 
+  // Shared background images component
+  const BackgroundImages = () => (
+    <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/70 to-indigo-100/70 z-10"></div>
+      <div className="absolute top-0 left-0 w-full h-full">
+        <img 
+          src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+          alt="Kamar Kost Modern" 
+          className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-60"
+        />
+      </div>
+      <div className="absolute top-0 left-0 w-full h-full">
+        <img 
+          src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+          alt="Interior Kost Nyaman" 
+          className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-50"
+        />
+      </div>
+      <div className="absolute top-0 left-0 w-full h-full">
+        <img 
+          src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+          alt="Kamar Kost Minimalis" 
+          className="w-full h-full object-cover animate-[pan_30s_ease-in-out_infinite] opacity-45"
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
@@ -99,31 +127,7 @@ const Index = () => {
 
       {/* Hero Section with Moving Background */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Moving Background Images */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/70 to-indigo-100/70 z-10"></div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Kamar Kost Modern" 
-              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-60"
-            />
-          </div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Interior Kost Nyaman" 
-              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-50"
-            />
-          </div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Kamar Kost Minimalis" 
-              className="w-full h-full object-cover animate-[pan_30s_ease-in-out_infinite] opacity-45"
-            />
-          </div>
-        </div>
+        <BackgroundImages />
 
         <div className="relative z-20 max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -135,40 +139,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Search Filters Section with Moving Background */}
-      <section className="relative py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Moving Background Images for Search */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-100/80 to-indigo-200/80 z-10"></div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Kamar Kost Modern" 
-              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-40"
-            />
-          </div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Interior Kost Nyaman" 
-              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-30"
-            />
-          </div>
-          <div className="absolute top-0 left-0 w-full h-full">
-            <img 
-              src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-              alt="Kamar Kost Minimalis" 
-              className="w-full h-full object-cover animate-[pan_30s_ease-in-out_infinite] opacity-25"
-            />
-          </div>
-        </div>
+      {/* Search Filters Section with Same Moving Background */}
+      <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <BackgroundImages />
 
         <div className="relative z-20 max-w-7xl mx-auto">
-          <SearchFilters 
-            onSearch={handleSearch}
-            filters={filters}
-            onFiltersChange={setFilters}
-          />
+          <div className="bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/30">
+            <div className="mb-6 text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Cari Kost Sesuai Keinginan Anda
+              </h3>
+              <p className="text-gray-700">
+                Gunakan filter pencarian untuk menemukan kost yang sempurna
+              </p>
+            </div>
+            <SearchFilters 
+              onSearch={handleSearch}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+          </div>
         </div>
       </section>
 
