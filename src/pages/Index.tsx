@@ -11,7 +11,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import KostList from "@/components/KostList";
 import SearchFilters from "@/components/SearchFilters";
 import TestimonialCard from "@/components/TestimonialCard";
-import ImageCarousel from "@/components/ImageCarousel";
 
 const Index = () => {
   const { user } = useAuth();
@@ -36,15 +35,6 @@ const Index = () => {
       setFilters(prev => ({ ...prev, facilities: searchFilters.facilities }));
     }
   };
-
-  // Background images for the carousel
-  const backgroundImages = [
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80",
-    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=2340&h=1400&fit=crop",
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=2340&h=1400&fit=crop",
-    "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=2340&h=1400&fit=crop",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=2340&h=1400&fit=crop"
-  ];
 
   // Sample testimonials data
   const testimonials = [
@@ -107,16 +97,23 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero & Search Section with Carousel Background */}
+      {/* Hero & Search Section with Single Clear Background */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-[80vh]">
-        {/* Image Carousel Background */}
-        <ImageCarousel images={backgroundImages} />
+        {/* Single Clear Background Image */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50 z-10"></div>
+          <img 
+            src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+            alt="Kost Modern" 
+            className="w-full h-full object-cover"
+          />
+        </div>
 
         <div className="relative z-20 max-w-7xl mx-auto">
           {/* Hero Content */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Temukan <span className="text-blue-300">Kost Impian</span> Anda
+              Temukan <span className="text-blue-600">Kost Impian</span> Anda
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow-md">
               Platform terpercaya untuk mencari kost nyaman, aman, dan terjangkau di seluruh Indonesia
