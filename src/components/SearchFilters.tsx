@@ -59,24 +59,24 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
 
   return (
     <div className="w-full max-w-5xl mx-auto">
-      {/* Main Search Bar - Enhanced */}
+      {/* Main Search Bar - Enhanced for Overlay */}
       <div className="flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex-1">
           <Input
             placeholder="Cari kost di area yang kamu inginkan..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-12 text-base border-2 border-white/50 bg-white/95 backdrop-blur-sm focus:border-blue-400 focus:bg-white transition-all duration-300 text-gray-800 placeholder:text-gray-600 shadow-lg rounded-xl"
+            className="h-12 text-base border-2 border-white/30 bg-white/20 backdrop-blur-md focus:border-white/50 focus:bg-white/30 transition-all duration-300 text-white placeholder:text-white/70 shadow-lg rounded-xl"
           />
         </div>
         <div className="flex-1">
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-5 h-5" />
             <Input
               placeholder="Lokasi (contoh: Jakarta, Bandung)"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="h-12 text-base border-2 border-white/50 bg-white/95 backdrop-blur-sm focus:border-blue-400 focus:bg-white transition-all duration-300 pl-11 text-gray-800 placeholder:text-gray-600 shadow-lg rounded-xl"
+              className="h-12 text-base border-2 border-white/30 bg-white/20 backdrop-blur-md focus:border-white/50 focus:bg-white/30 transition-all duration-300 pl-11 text-white placeholder:text-white/70 shadow-lg rounded-xl"
             />
           </div>
         </div>
@@ -84,7 +84,7 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
           <Button 
             onClick={handleSearch}
             size="default" 
-            className="h-12 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 hover:scale-105 shadow-xl rounded-xl font-semibold"
+            className="h-12 px-8 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-xl rounded-xl border-0"
           >
             <Search className="w-5 h-5 mr-2" />
             Cari Kost
@@ -93,23 +93,23 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
             variant="outline"
             size="default"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="h-12 px-4 border-2 border-white/50 bg-white/95 backdrop-blur-sm hover:bg-white hover:border-blue-400 transition-all duration-300 shadow-lg rounded-xl"
+            className="h-12 px-4 border-2 border-white/30 bg-white/20 backdrop-blur-md hover:bg-white/30 hover:border-white/50 transition-all duration-300 shadow-lg rounded-xl text-white"
           >
             <Filter className="w-5 h-5" />
           </Button>
         </div>
       </div>
 
-      {/* Advanced Filters - Enhanced */}
+      {/* Advanced Filters - Enhanced for Overlay */}
       {showAdvanced && (
-        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 space-y-4 animate-fade-in shadow-2xl border border-white/50">
+        <div className="bg-white/15 backdrop-blur-xl rounded-2xl p-6 space-y-4 animate-fade-in shadow-2xl border border-white/20">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-800">Filter Lanjutan</h3>
+            <h3 className="text-lg font-semibold text-white">Filter Lanjutan</h3>
             <Button
               variant="ghost"
               size="sm"
               onClick={clearFilters}
-              className="text-gray-600 hover:text-gray-800 hover:bg-gray-100/50 rounded-lg"
+              className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg"
             >
               <X className="w-4 h-4 mr-1" />
               Reset
@@ -119,7 +119,7 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Price Range */}
             <div className="space-y-3">
-              <Label className="text-gray-700 font-medium">Rentang Harga</Label>
+              <Label className="text-white font-medium">Rentang Harga</Label>
               <div className="px-3">
                 <Slider
                   value={priceRange}
@@ -129,18 +129,18 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
                   step={100000}
                   className="w-full"
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-2">
-                  <span className="bg-blue-50 px-2 py-1 rounded-lg">Rp {priceRange[0].toLocaleString()}</span>
-                  <span className="bg-blue-50 px-2 py-1 rounded-lg">Rp {priceRange[1].toLocaleString()}</span>
+                <div className="flex justify-between text-sm text-white/80 mt-2">
+                  <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-lg">Rp {priceRange[0].toLocaleString()}</span>
+                  <span className="bg-white/20 backdrop-blur-sm px-2 py-1 rounded-lg">Rp {priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
             {/* Room Type */}
             <div className="space-y-3">
-              <Label className="text-gray-700 font-medium">Tipe Kamar</Label>
+              <Label className="text-white font-medium">Tipe Kamar</Label>
               <Select value={roomType} onValueChange={setRoomType}>
-                <SelectTrigger className="text-gray-800 h-10 bg-white border-gray-200 rounded-lg shadow-sm">
+                <SelectTrigger className="text-white h-10 bg-white/20 backdrop-blur-sm border-white/30 rounded-lg shadow-sm">
                   <SelectValue placeholder="Pilih tipe kamar" />
                 </SelectTrigger>
                 <SelectContent>
@@ -154,13 +154,17 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
 
             {/* Facilities */}
             <div className="space-y-3 md:col-span-2 lg:col-span-1">
-              <Label className="text-gray-700 font-medium">Fasilitas</Label>
+              <Label className="text-white font-medium">Fasilitas</Label>
               <div className="flex flex-wrap gap-2">
                 {availableFacilities.map((facility) => (
                   <Badge
                     key={facility}
                     variant={facilities.includes(facility) ? "default" : "outline"}
-                    className="cursor-pointer hover:scale-105 transition-transform text-sm py-1 px-3 rounded-full"
+                    className={`cursor-pointer hover:scale-105 transition-transform text-sm py-1 px-3 rounded-full ${
+                      facilities.includes(facility) 
+                        ? "bg-yellow-500 text-white border-yellow-500" 
+                        : "bg-white/20 text-white border-white/30 hover:bg-white/30"
+                    }`}
                     onClick={() => toggleFacility(facility)}
                   >
                     {facility}
@@ -172,20 +176,20 @@ const SearchFilters = ({ onSearch, filters, onFiltersChange }: SearchFiltersProp
 
           {/* Active Filters */}
           {(facilities.length > 0 || roomType || searchQuery || location) && (
-            <div className="pt-4 border-t border-gray-200/50">
-              <Label className="text-gray-700 font-medium text-sm">Filter Aktif:</Label>
+            <div className="pt-4 border-t border-white/20">
+              <Label className="text-white font-medium text-sm">Filter Aktif:</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {searchQuery && (
-                  <Badge variant="secondary" className="text-sm bg-blue-100 text-blue-800">Pencarian: {searchQuery}</Badge>
+                  <Badge variant="secondary" className="text-sm bg-blue-500/80 text-white backdrop-blur-sm">Pencarian: {searchQuery}</Badge>
                 )}
                 {location && (
-                  <Badge variant="secondary" className="text-sm bg-green-100 text-green-800">Lokasi: {location}</Badge>
+                  <Badge variant="secondary" className="text-sm bg-green-500/80 text-white backdrop-blur-sm">Lokasi: {location}</Badge>
                 )}
                 {roomType && (
-                  <Badge variant="secondary" className="text-sm bg-purple-100 text-purple-800">Tipe: {roomType}</Badge>
+                  <Badge variant="secondary" className="text-sm bg-purple-500/80 text-white backdrop-blur-sm">Tipe: {roomType}</Badge>
                 )}
                 {facilities.map((facility) => (
-                  <Badge key={facility} variant="secondary" className="text-sm bg-orange-100 text-orange-800">
+                  <Badge key={facility} variant="secondary" className="text-sm bg-orange-500/80 text-white backdrop-blur-sm">
                     {facility}
                   </Badge>
                 ))}
