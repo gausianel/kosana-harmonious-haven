@@ -40,7 +40,7 @@ const ImageCarousel = ({ images }: ImageCarouselProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % displayImages.length);
-    }, 4000);
+    }, 6000); // Changed from 4000 to 6000 for moderate speed
 
     return () => clearInterval(timer);
   }, [displayImages.length]);
@@ -51,10 +51,10 @@ const ImageCarousel = ({ images }: ImageCarouselProps) => {
         <div
           key={index}
           className={cn(
-            "absolute inset-0 transition-all duration-1000 ease-in-out",
+            "absolute inset-0 transition-opacity duration-1000 ease-in-out", // Removed scale and blur effects
             index === currentIndex 
-              ? "opacity-30 scale-100" 
-              : "opacity-0 scale-105"
+              ? "opacity-100" // Changed from opacity-30 to opacity-100 and removed scale
+              : "opacity-0"
           )}
         >
           <img
