@@ -113,7 +113,7 @@ const Index = () => {
           {/* Hero Content */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Temukan <span className="text-yellow-300">Kost Impian</span> Anda
+              Temukan <span className="text-blue-300">Kost Impian</span> Anda
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow-md">
               Platform terpercaya untuk mencari kost nyaman, aman, dan terjangkau di seluruh Indonesia
