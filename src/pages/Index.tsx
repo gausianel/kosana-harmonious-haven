@@ -99,12 +99,12 @@ const Index = () => {
 
       {/* Hero & Search Section with Single Clear Background */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden min-h-[80vh]">
-        {/* Single Clear Background Image */}
+        {/* Single Clear Background Image - NEW IMAGE */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-indigo-900/50 z-10"></div>
           <img 
-            src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
-            alt="Kost Modern" 
+            src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+            alt="Modern Kost Building" 
             className="w-full h-full object-cover"
           />
         </div>
