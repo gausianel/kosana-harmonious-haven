@@ -135,9 +135,35 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Search Filters Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
+      {/* Search Filters Section with Moving Background */}
+      <section className="relative py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Moving Background Images for Search */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100/80 to-indigo-200/80 z-10"></div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Kamar Kost Modern" 
+              className="w-full h-full object-cover animate-[pan_20s_ease-in-out_infinite] opacity-40"
+            />
+          </div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Interior Kost Nyaman" 
+              className="w-full h-full object-cover animate-[pan_25s_ease-in-out_infinite_reverse] opacity-30"
+            />
+          </div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <img 
+              src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80" 
+              alt="Kamar Kost Minimalis" 
+              className="w-full h-full object-cover animate-[pan_30s_ease-in-out_infinite] opacity-25"
+            />
+          </div>
+        </div>
+
+        <div className="relative z-20 max-w-7xl mx-auto">
           <SearchFilters 
             onSearch={handleSearch}
             filters={filters}
